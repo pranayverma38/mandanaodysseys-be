@@ -119,7 +119,7 @@ export default async function seedItineraries({ container }: ExecArgs) {
       console.log(`  Skipping ${data.handle} (already exists)`)
       continue
     }
-    await itineraryService.createItineraries(data)
+    await itineraryService.createItineraries(data as any)
     console.log(`  Created: ${data.title}`)
   }
 

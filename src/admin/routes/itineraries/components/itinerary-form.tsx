@@ -1,5 +1,5 @@
 import { Button, Input, Textarea, Select, Switch, Text, Heading, Badge } from '@medusajs/ui'
-import { PlusIcon, XMarkIcon } from '@medusajs/icons'
+import { Plus, XMark } from '@medusajs/icons'
 import { useState } from 'react'
 
 export type ItineraryFormData = {
@@ -290,7 +290,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
               onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addGalleryImg())}
             />
             <Button type="button" variant="secondary" size="small" onClick={addGalleryImg}>
-              <PlusIcon /> Add
+              <Plus /> Add
             </Button>
           </div>
           <div className="space-y-2 mt-2">
@@ -299,7 +299,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
                 <img src={url} alt="" className="h-10 w-16 object-cover rounded" />
                 <Text size="small" className="flex-1 truncate text-ui-fg-subtle">{url}</Text>
                 <Button type="button" variant="danger" size="small" onClick={() => removeGalleryImg(i)}>
-                  <XMarkIcon />
+                  <XMark />
                 </Button>
               </div>
             ))}
@@ -338,7 +338,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
             onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addCategory())}
           />
           <Button type="button" variant="secondary" size="small" onClick={addCategory}>
-            <PlusIcon /> Add
+            <Plus /> Add
           </Button>
         </div>
         <div className="flex flex-wrap gap-2 mt-2">
@@ -346,7 +346,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
             <Badge key={i} color="blue" className="flex items-center gap-1">
               {cat.category}
               <button type="button" onClick={() => removeCategory(i)} className="ml-1">
-                <XMarkIcon className="w-3 h-3" />
+                <XMark className="w-3 h-3" />
               </button>
             </Badge>
           ))}
@@ -368,12 +368,12 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
                 <Input value={loc.lng} onChange={e => updateLocation(i, 'lng', e.target.value)} placeholder="115.2625" />
               </Field>
               <Button type="button" variant="danger" size="small" onClick={() => removeLocation(i)} className="mb-0.5">
-                <XMarkIcon />
+                <XMark />
               </Button>
             </div>
           ))}
           <Button type="button" variant="secondary" size="small" onClick={addLocation}>
-            <PlusIcon /> Add Location
+            <Plus /> Add Location
           </Button>
         </div>
 
@@ -408,12 +408,12 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
                 <Input value={amenity.text} onChange={e => updateAmenity(i, 'text', e.target.value)} placeholder="Private pool villas" />
               </Field>
               <Button type="button" variant="danger" size="small" onClick={() => removeAmenity(i)} className="mb-0.5">
-                <XMarkIcon />
+                <XMark />
               </Button>
             </div>
           ))}
           <Button type="button" variant="secondary" size="small" onClick={addAmenity}>
-            <PlusIcon /> Add Amenity
+            <Plus /> Add Amenity
           </Button>
         </div>
       </Section>
@@ -426,7 +426,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
               <div className="flex justify-between items-center">
                 <Text weight="plus" size="small">Activity {i + 1}</Text>
                 <Button type="button" variant="danger" size="small" onClick={() => removeThingToDo(i)}>
-                  <XMarkIcon /> Remove
+                  <XMark /> Remove
                 </Button>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -452,7 +452,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
             </div>
           ))}
           <Button type="button" variant="secondary" size="small" onClick={addThingToDo}>
-            <PlusIcon /> Add Activity
+            <Plus /> Add Activity
           </Button>
         </div>
       </Section>
@@ -467,7 +467,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
             onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addInclude())}
           />
           <Button type="button" variant="secondary" size="small" onClick={addInclude}>
-            <PlusIcon /> Add
+            <Plus /> Add
           </Button>
         </div>
         <div className="space-y-2 mt-2">
@@ -475,7 +475,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
             <div key={i} className="flex items-center gap-2">
               <Text size="small" className="flex-1">✓ {item}</Text>
               <Button type="button" variant="danger" size="small" onClick={() => removeInclude(i)}>
-                <XMarkIcon />
+                <XMark />
               </Button>
             </div>
           ))}
@@ -492,7 +492,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
             onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addExclude())}
           />
           <Button type="button" variant="secondary" size="small" onClick={addExclude}>
-            <PlusIcon /> Add
+            <Plus /> Add
           </Button>
         </div>
         <div className="space-y-2 mt-2">
@@ -500,7 +500,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
             <div key={i} className="flex items-center gap-2">
               <Text size="small" className="flex-1">✗ {item}</Text>
               <Button type="button" variant="danger" size="small" onClick={() => removeExclude(i)}>
-                <XMarkIcon />
+                <XMark />
               </Button>
             </div>
           ))}
@@ -515,7 +515,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
               <div className="flex justify-between items-center">
                 <Text weight="plus" size="small">Hotel {i + 1}</Text>
                 <Button type="button" variant="danger" size="small" onClick={() => removeAccommodation(i)}>
-                  <XMarkIcon /> Remove
+                  <XMark /> Remove
                 </Button>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -535,7 +535,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
             </div>
           ))}
           <Button type="button" variant="secondary" size="small" onClick={addAccommodation}>
-            <PlusIcon /> Add Accommodation
+            <Plus /> Add Accommodation
           </Button>
         </div>
       </Section>
@@ -548,7 +548,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
               <div className="flex justify-between items-center">
                 <Text weight="plus" size="small">Review {i + 1}</Text>
                 <Button type="button" variant="danger" size="small" onClick={() => removeReview(i)}>
-                  <XMarkIcon /> Remove
+                  <XMark /> Remove
                 </Button>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -574,7 +574,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
             </div>
           ))}
           <Button type="button" variant="secondary" size="small" onClick={addReview}>
-            <PlusIcon /> Add Review
+            <Plus /> Add Review
           </Button>
         </div>
       </Section>

@@ -1,5 +1,5 @@
 import { defineRouteConfig } from '@medusajs/admin-sdk'
-import { MapPinIcon, PencilIcon, TrashIcon, PlusIcon } from '@medusajs/icons'
+import { Map, Pencil, Trash, Plus } from '@medusajs/icons'
 import { Button, Container, Heading, Text, Badge, Table, toast, usePrompt } from '@medusajs/ui'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -21,7 +21,7 @@ type Itinerary = {
 
 export const config = defineRouteConfig({
   label: 'Itineraries',
-  icon: MapPinIcon,
+  icon: Map,
 })
 
 export default function ItinerariesPage() {
@@ -84,7 +84,7 @@ export default function ItinerariesPage() {
           </Text>
         </div>
         <Button size="small" onClick={() => navigate('/itineraries/create')}>
-          <PlusIcon />
+          <Plus />
           Create Itinerary
         </Button>
       </div>
@@ -95,10 +95,10 @@ export default function ItinerariesPage() {
         </div>
       ) : itineraries.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 gap-4">
-          <MapPinIcon className="text-ui-fg-muted" />
+          <Map className="text-ui-fg-muted" />
           <Text className="text-ui-fg-subtle">No itineraries yet. Create your first one.</Text>
           <Button size="small" onClick={() => navigate('/itineraries/create')}>
-            <PlusIcon />
+            <Plus />
             Create Itinerary
           </Button>
         </div>
@@ -154,7 +154,7 @@ export default function ItinerariesPage() {
                         navigate(`/itineraries/${it.id}`)
                       }}
                     >
-                      <PencilIcon />
+                      <Pencil />
                     </Button>
                     <Button
                       size="small"
@@ -164,7 +164,7 @@ export default function ItinerariesPage() {
                         handleDelete(it)
                       }}
                     >
-                      <TrashIcon />
+                      <Trash />
                     </Button>
                   </div>
                 </Table.Cell>

@@ -7,7 +7,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
 
   const { limit = '100', offset = '0' } = req.query as Record<string, string>
 
-  const itineraries = await itineraryService.listItineraries(
+  const [itineraries, count] = await itineraryService.listAndCountItineraries(
     {},
     {
       take: parseInt(limit),
@@ -15,8 +15,6 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       order: { created_at: 'DESC' },
     }
   )
-
-  const count = await itineraryService.countItineraries()
 
   res.json({
     itineraries: itineraries.map(formatItinerary),
@@ -32,7 +30,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   const body = req.body as Record<string, unknown>
   const data = buildItineraryData(body)
 
-  const itinerary = await itineraryService.createItineraries(data)
+  const itinerary = await itineraryService.createItineraries(data as any)
 
   res.status(201).json({ itinerary: formatItinerary(itinerary) })
 }
