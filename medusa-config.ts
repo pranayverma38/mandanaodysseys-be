@@ -33,6 +33,9 @@ module.exports = defineConfig({
   },
   modules: [
     {
+      resolve: './src/modules/itinerary',
+    },
+    {
       resolve: '@medusajs/medusa/file',
       options: {
         providers: [
