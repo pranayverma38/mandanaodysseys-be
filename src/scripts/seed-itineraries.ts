@@ -29,9 +29,9 @@ const ITINERARIES = [
       'https://images.pexels.com/photos/3581369/pexels-photo-3581369.jpeg?auto=compress&cs=tinysrgb&w=1600',
     ],
     amenities: [
-      { icon: 'Car01Icon', text: 'Private A/C cab throughout' },
+      { icon: 'SteeringIcon', text: 'Private A/C cab throughout' },
       { icon: 'ChefHatIcon', text: 'Daily breakfast included' },
-      { icon: 'Camera01Icon', text: 'Professional guide' },
+      { icon: 'UserMultipleIcon', text: 'Professional guide' },
     ],
     pricing: { price: '$1,299', originalPrice: '$1,599', feeAndTaxes: '$144', total: '$1,443' },
     description: 'Explore India\'s most iconic triangle — the imperial grandeur of Delhi, the timeless Taj Mahal in Agra, and the pink-hued palaces of Jaipur — across six unforgettable days.',

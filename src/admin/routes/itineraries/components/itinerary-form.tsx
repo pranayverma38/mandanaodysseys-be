@@ -1,6 +1,8 @@
 import { Button, Input, Textarea, Select, Switch, Text, Heading, Badge } from '@medusajs/ui'
 import { Plus, XMark } from '@medusajs/icons'
 import { useState } from 'react'
+import { FRONTEND_SUPPORTED_CATEGORY_OPTIONS } from '../utils/frontend-category-options'
+import { DEFAULT_AMENITY_ICON, FRONTEND_SUPPORTED_ICON_OPTIONS } from '../utils/frontend-icon-options'
 
 export type ItineraryFormData = {
   handle: string
@@ -57,11 +59,6 @@ export const DEFAULT_FORM_DATA: ItineraryFormData = {
 }
 
 const MOBILITY_OPTIONS = ['Easy', 'Light Activity', 'Moderate', 'Active']
-const ICON_OPTIONS = [
-  'BedSingle02Icon', 'ChefHatIcon', 'Beach02Icon', 'AirplaneModeIcon', 'Car01Icon',
-  'Camera01Icon', 'Heart01Icon', 'MountainIcon', 'FoodIcon', 'WifiIcon',
-  'PoolIcon', 'SpaIcon', 'Clock01Icon', 'MapPinIcon',
-]
 
 type SectionProps = { title: string; children: React.ReactNode }
 function Section({ title, children }: SectionProps) {
@@ -119,7 +116,8 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
   const [newCategory, setNewCategory] = useState('')
   const addCategory = () => {
     if (!newCategory.trim()) return
-    set('categories', [...data.categories, { category: newCategory.trim() }])
+    if (data.categories.some((category) => category.category === newCategory)) return
+    set('categories', [...data.categories, { category: newCategory }])
     setNewCategory('')
   }
   const removeCategory = (i: number) =>
@@ -137,7 +135,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
 
   // ---- Amenities ----
   const addAmenity = () =>
-    set('amenities', [...data.amenities, { icon: 'BedSingle02Icon', text: '' }])
+    set('amenities', [...data.amenities, { icon: DEFAULT_AMENITY_ICON, text: '' }])
   const updateAmenity = (i: number, field: string, value: string) => {
     const items = [...data.amenities]
     items[i] = { ...items[i], [field]: value }
@@ -331,12 +329,18 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
       {/* Categories */}
       <Section title="Categories">
         <div className="flex gap-2">
-          <Input
-            value={newCategory}
-            onChange={e => setNewCategory(e.target.value)}
-            placeholder="honeymoon-packages"
-            onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addCategory())}
-          />
+          <Select value={newCategory} onValueChange={setNewCategory}>
+            <Select.Trigger className="w-full">
+              <Select.Value placeholder="Select a supported category" />
+            </Select.Trigger>
+            <Select.Content>
+              {FRONTEND_SUPPORTED_CATEGORY_OPTIONS.map((category) => (
+                <Select.Item key={category} value={category}>
+                  {category}
+                </Select.Item>
+              ))}
+            </Select.Content>
+          </Select>
           <Button type="button" variant="secondary" size="small" onClick={addCategory}>
             <Plus /> Add
           </Button>
@@ -398,7 +402,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
                     <Select.Value />
                   </Select.Trigger>
                   <Select.Content>
-                    {ICON_OPTIONS.map(icon => (
+                    {FRONTEND_SUPPORTED_ICON_OPTIONS.map(icon => (
                       <Select.Item key={icon} value={icon}>{icon}</Select.Item>
                     ))}
                   </Select.Content>
