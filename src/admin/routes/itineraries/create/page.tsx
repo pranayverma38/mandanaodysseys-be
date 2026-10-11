@@ -45,13 +45,13 @@ export default function CreateItineraryPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-6 px-4 space-y-4">
+    <div className="mx-auto w-full max-w-7xl space-y-4 px-4 py-6">
       <div>
         <Heading level="h1">Create Itinerary</Heading>
         <Text className="text-ui-fg-subtle mt-1">Add a new tour package to the website</Text>
       </div>
 
-      <Container className="p-6">
+      <Container className="p-6 lg:p-8">
         <ItineraryForm
           data={formData}
           onChange={setFormData}

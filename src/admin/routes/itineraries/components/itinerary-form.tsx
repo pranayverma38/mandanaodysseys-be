@@ -60,24 +60,47 @@ export const DEFAULT_FORM_DATA: ItineraryFormData = {
 
 const MOBILITY_OPTIONS = ['Easy', 'Light Activity', 'Moderate', 'Active']
 
-type SectionProps = { title: string; children: React.ReactNode }
-function Section({ title, children }: SectionProps) {
+type SectionProps = {
+  title: string
+  children: React.ReactNode
+  description?: string
+}
+
+function Section({ title, children, description }: SectionProps) {
   return (
-    <div className="border border-ui-border-base rounded-lg p-5 space-y-4">
-      <Heading level="h3" className="text-ui-fg-base">{title}</Heading>
+    <div className="space-y-4 rounded-xl border border-ui-border-base bg-ui-bg-base p-5 shadow-elevation-card-rest">
+      <div className="space-y-1">
+        <Heading level="h3" className="text-ui-fg-base">{title}</Heading>
+        {description ? (
+          <Text size="small" className="text-ui-fg-subtle">
+            {description}
+          </Text>
+        ) : null}
+      </div>
       {children}
     </div>
   )
 }
 
 type FieldProps = { label: string; children: React.ReactNode; required?: boolean }
+
 function Field({ label, children, required }: FieldProps) {
   return (
     <div className="space-y-1.5">
       <Text size="small" weight="plus" className="text-ui-fg-subtle">
-        {label}{required && <span className="text-ui-fg-error ml-0.5">*</span>}
+        {label}{required && <span className="ml-0.5 text-ui-fg-error">*</span>}
       </Text>
       {children}
+    </div>
+  )
+}
+
+function EmptyState({ message }: { message: string }) {
+  return (
+    <div className="rounded-lg border border-dashed border-ui-border-base bg-ui-bg-subtle px-4 py-6 text-center">
+      <Text size="small" className="text-ui-fg-subtle">
+        {message}
+      </Text>
     </div>
   )
 }
@@ -92,6 +115,8 @@ type Props = {
 }
 
 export default function ItineraryForm({ data, onChange, loading, onSubmit, submitLabel, onCancel }: Props) {
+  const twoColumnGridClass = 'grid grid-cols-1 gap-4 md:grid-cols-2'
+
   const set = (field: keyof ItineraryFormData, value: unknown) =>
     onChange({ ...data, [field]: value })
 
@@ -101,339 +126,466 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
   const setDuration = (field: keyof ItineraryFormData['duration'], value: string) =>
     onChange({ ...data, duration: { ...data.duration, [field]: value } })
 
-  // ---- Locations ----
   const addLocation = () =>
     set('locations', [...data.locations, { name: '', lat: '', lng: '' }])
+
   const updateLocation = (i: number, field: string, value: string) => {
     const locs = [...data.locations]
     locs[i] = { ...locs[i], [field]: value }
     set('locations', locs)
   }
+
   const removeLocation = (i: number) =>
     set('locations', data.locations.filter((_, idx) => idx !== i))
 
-  // ---- Categories ----
   const [newCategory, setNewCategory] = useState('')
+
   const addCategory = () => {
     if (!newCategory.trim()) return
     if (data.categories.some((category) => category.category === newCategory)) return
     set('categories', [...data.categories, { category: newCategory }])
     setNewCategory('')
   }
+
   const removeCategory = (i: number) =>
     set('categories', data.categories.filter((_, idx) => idx !== i))
 
-  // ---- Gallery ----
   const [newGalleryUrl, setNewGalleryUrl] = useState('')
+
   const addGalleryImg = () => {
     if (!newGalleryUrl.trim()) return
     set('gallery_imgs', [...data.gallery_imgs, newGalleryUrl.trim()])
     setNewGalleryUrl('')
   }
+
   const removeGalleryImg = (i: number) =>
     set('gallery_imgs', data.gallery_imgs.filter((_, idx) => idx !== i))
 
-  // ---- Amenities ----
   const addAmenity = () =>
     set('amenities', [...data.amenities, { icon: DEFAULT_AMENITY_ICON, text: '' }])
+
   const updateAmenity = (i: number, field: string, value: string) => {
     const items = [...data.amenities]
     items[i] = { ...items[i], [field]: value }
     set('amenities', items)
   }
+
   const removeAmenity = (i: number) =>
     set('amenities', data.amenities.filter((_, idx) => idx !== i))
 
-  // ---- Things To Do ----
   const addThingToDo = () =>
     set('things_to_do', [...data.things_to_do, { name: '', time: '', description: '', imageUrl: '', lat: '', lng: '' }])
+
   const updateThingToDo = (i: number, field: string, value: string) => {
     const items = [...data.things_to_do]
     items[i] = { ...items[i], [field]: value }
     set('things_to_do', items)
   }
+
   const removeThingToDo = (i: number) =>
     set('things_to_do', data.things_to_do.filter((_, idx) => idx !== i))
 
-  // ---- Includes ----
   const [newInclude, setNewInclude] = useState('')
+
   const addInclude = () => {
     if (!newInclude.trim()) return
     set('includes', [...data.includes, newInclude.trim()])
     setNewInclude('')
   }
+
   const removeInclude = (i: number) =>
     set('includes', data.includes.filter((_, idx) => idx !== i))
 
-  // ---- Excludes ----
   const [newExclude, setNewExclude] = useState('')
+
   const addExclude = () => {
     if (!newExclude.trim()) return
     set('excludes', [...data.excludes, newExclude.trim()])
     setNewExclude('')
   }
+
   const removeExclude = (i: number) =>
     set('excludes', data.excludes.filter((_, idx) => idx !== i))
 
-  // ---- Accommodations ----
   const addAccommodation = () =>
     set('accommodations', [...data.accommodations, { name: '', imageUrl: '', rating: '4.5', location: '' }])
+
   const updateAccommodation = (i: number, field: string, value: string) => {
     const items = [...data.accommodations]
     items[i] = { ...items[i], [field]: value }
     set('accommodations', items)
   }
+
   const removeAccommodation = (i: number) =>
     set('accommodations', data.accommodations.filter((_, idx) => idx !== i))
 
-  // ---- Reviews ----
   const addReview = () =>
     set('reviews', [...data.reviews, {
       id: String(Date.now()),
-      title: '', rating: '5', content: '',
-      author: '', date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+      title: '',
+      rating: '5',
+      content: '',
+      author: '',
+      date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
       datetime: new Date().toISOString().split('T')[0],
       author_avatar_url: '',
     }])
+
   const updateReview = (i: number, field: string, value: string) => {
     const items = [...data.reviews]
     items[i] = { ...items[i], [field]: value }
     set('reviews', items)
   }
+
   const removeReview = (i: number) =>
     set('reviews', data.reviews.filter((_, idx) => idx !== i))
 
   return (
     <div className="space-y-6">
-      {/* Basic Info */}
-      <Section title="Basic Information">
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="Title" required>
-            <Input value={data.title} onChange={e => set('title', e.target.value)} placeholder="Bali Honeymoon Retreat" />
-          </Field>
-          <Field label="Handle (URL slug)" required>
-            <Input value={data.handle} onChange={e => set('handle', e.target.value)} placeholder="bali-honeymoon-retreat" />
-          </Field>
-          <Field label="Badge">
-            <Input value={data.badge} onChange={e => set('badge', e.target.value)} placeholder="Romantic" />
-          </Field>
-          <Field label="Destination slug" required>
-            <Input value={data.destination} onChange={e => set('destination', e.target.value)} placeholder="bali" />
-          </Field>
-          <Field label="Address / Route" required>
-            <Input value={data.address} onChange={e => set('address', e.target.value)} placeholder="Ubud · Seminyak · Uluwatu" />
-          </Field>
-          <Field label="Mobility">
-            <Select value={data.mobility} onValueChange={v => set('mobility', v)}>
-              <Select.Trigger>
-                <Select.Value />
-              </Select.Trigger>
-              <Select.Content>
-                {MOBILITY_OPTIONS.map(m => (
-                  <Select.Item key={m} value={m}>{m}</Select.Item>
-                ))}
-              </Select.Content>
-            </Select>
-          </Field>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="Duration — Days" required>
-            <Input type="number" min="1" value={data.duration.days} onChange={e => setDuration('days', e.target.value)} />
-          </Field>
-          <Field label="Duration — Nights" required>
-            <Input type="number" min="0" value={data.duration.nights} onChange={e => setDuration('nights', e.target.value)} />
-          </Field>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="Average Rating">
-            <Input type="number" min="0" max="5" step="0.1" value={data.review_start} onChange={e => set('review_start', e.target.value)} />
-          </Field>
-          <Field label="Review Count">
-            <Input type="number" min="0" value={data.review_count} onChange={e => set('review_count', e.target.value)} />
-          </Field>
-        </div>
-
-        <Field label="Active">
-          <Switch checked={data.is_active} onCheckedChange={v => set('is_active', v)} />
-        </Field>
-      </Section>
-
-      {/* Description */}
-      <Section title="Description">
-        <Textarea
-          value={data.description}
-          onChange={e => set('description', e.target.value)}
-          placeholder="Write a compelling description of this itinerary..."
-          rows={4}
-        />
-      </Section>
-
-      {/* Images */}
-      <Section title="Images">
-        <Field label="Featured Image URL">
-          <Input value={data.featured_image} onChange={e => set('featured_image', e.target.value)} placeholder="https://..." />
-        </Field>
-        {data.featured_image && (
-          <img src={data.featured_image} alt="Featured" className="h-32 w-full object-cover rounded-md" />
-        )}
-
-        <Field label="Gallery Images">
-          <div className="flex gap-2">
-            <Input
-              value={newGalleryUrl}
-              onChange={e => setNewGalleryUrl(e.target.value)}
-              placeholder="https://..."
-              onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addGalleryImg())}
-            />
-            <Button type="button" variant="secondary" size="small" onClick={addGalleryImg}>
-              <Plus /> Add
-            </Button>
-          </div>
-          <div className="space-y-2 mt-2">
-            {data.gallery_imgs.map((url, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <img src={url} alt="" className="h-10 w-16 object-cover rounded" />
-                <Text size="small" className="flex-1 truncate text-ui-fg-subtle">{url}</Text>
-                <Button type="button" variant="danger" size="small" onClick={() => removeGalleryImg(i)}>
-                  <XMark />
-                </Button>
-              </div>
-            ))}
-          </div>
-        </Field>
-      </Section>
-
-      {/* Pricing */}
-      <Section title="Pricing">
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="Price (e.g. $2,899)" required>
-            <Input value={data.pricing.price} onChange={e => setPricing('price', e.target.value)} placeholder="$2,899" />
-          </Field>
-          <Field label="Original Price">
-            <Input value={data.pricing.original_price} onChange={e => setPricing('original_price', e.target.value)} placeholder="$3,399" />
-          </Field>
-          <Field label="Fees & Taxes">
-            <Input value={data.pricing.fee_and_taxes} onChange={e => setPricing('fee_and_taxes', e.target.value)} placeholder="$322" />
-          </Field>
-          <Field label="Total">
-            <Input value={data.pricing.total} onChange={e => setPricing('total', e.target.value)} placeholder="$3,221" />
-          </Field>
-          <Field label="Price Label (optional)">
-            <Input value={data.pricing.price_label} onChange={e => setPricing('price_label', e.target.value)} placeholder="per person" />
-          </Field>
-        </div>
-      </Section>
-
-      {/* Categories */}
-      <Section title="Categories">
-        <div className="flex gap-2">
-          <Select value={newCategory} onValueChange={setNewCategory}>
-            <Select.Trigger className="w-full">
-              <Select.Value placeholder="Select a supported category" />
-            </Select.Trigger>
-            <Select.Content>
-              {FRONTEND_SUPPORTED_CATEGORY_OPTIONS.map((category) => (
-                <Select.Item key={category} value={category}>
-                  {category}
-                </Select.Item>
-              ))}
-            </Select.Content>
-          </Select>
-          <Button type="button" variant="secondary" size="small" onClick={addCategory}>
-            <Plus /> Add
-          </Button>
-        </div>
-        <div className="flex flex-wrap gap-2 mt-2">
-          {data.categories.map((cat, i) => (
-            <Badge key={i} color="blue" className="flex items-center gap-1">
-              {cat.category}
-              <button type="button" onClick={() => removeCategory(i)} className="ml-1">
-                <XMark className="w-3 h-3" />
-              </button>
-            </Badge>
-          ))}
-        </div>
-      </Section>
-
-      {/* Locations */}
-      <Section title="Locations (for map)">
-        <div className="space-y-3">
-          {data.locations.map((loc, i) => (
-            <div key={i} className="flex gap-2 items-end">
-              <Field label="Name">
-                <Input value={loc.name} onChange={e => updateLocation(i, 'name', e.target.value)} placeholder="Ubud" />
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(320px,1fr)]">
+        <div className="space-y-6">
+          <Section
+            title="Basic Information"
+            description="Core trip details shown in the itinerary listing and detail page."
+          >
+            <div className={twoColumnGridClass}>
+              <Field label="Title" required>
+                <Input value={data.title} onChange={e => set('title', e.target.value)} placeholder="Bali Honeymoon Retreat" />
               </Field>
-              <Field label="Lat">
-                <Input value={loc.lat} onChange={e => updateLocation(i, 'lat', e.target.value)} placeholder="-8.5069" />
+              <Field label="Handle (URL slug)" required>
+                <Input value={data.handle} onChange={e => set('handle', e.target.value)} placeholder="bali-honeymoon-retreat" />
               </Field>
-              <Field label="Lng">
-                <Input value={loc.lng} onChange={e => updateLocation(i, 'lng', e.target.value)} placeholder="115.2625" />
+              <Field label="Badge">
+                <Input value={data.badge} onChange={e => set('badge', e.target.value)} placeholder="Romantic" />
               </Field>
-              <Button type="button" variant="danger" size="small" onClick={() => removeLocation(i)} className="mb-0.5">
-                <XMark />
-              </Button>
-            </div>
-          ))}
-          <Button type="button" variant="secondary" size="small" onClick={addLocation}>
-            <Plus /> Add Location
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 mt-2">
-          <Field label="Map Center Lat">
-            <Input value={data.map_lat} onChange={e => set('map_lat', e.target.value)} placeholder="-8.4095" />
-          </Field>
-          <Field label="Map Center Lng">
-            <Input value={data.map_lng} onChange={e => set('map_lng', e.target.value)} placeholder="115.1889" />
-          </Field>
-        </div>
-      </Section>
-
-      {/* Amenities */}
-      <Section title="Amenities">
-        <div className="space-y-3">
-          {data.amenities.map((amenity, i) => (
-            <div key={i} className="flex gap-2 items-end">
-              <Field label="Icon">
-                <Select value={amenity.icon} onValueChange={v => updateAmenity(i, 'icon', v)}>
-                  <Select.Trigger className="w-48">
+              <Field label="Destination slug" required>
+                <Input value={data.destination} onChange={e => set('destination', e.target.value)} placeholder="bali" />
+              </Field>
+              <Field label="Address / Route" required>
+                <Input value={data.address} onChange={e => set('address', e.target.value)} placeholder="Ubud · Seminyak · Uluwatu" />
+              </Field>
+              <Field label="Mobility">
+                <Select value={data.mobility} onValueChange={v => set('mobility', v)}>
+                  <Select.Trigger>
                     <Select.Value />
                   </Select.Trigger>
                   <Select.Content>
-                    {FRONTEND_SUPPORTED_ICON_OPTIONS.map(icon => (
-                      <Select.Item key={icon} value={icon}>{icon}</Select.Item>
+                    {MOBILITY_OPTIONS.map(m => (
+                      <Select.Item key={m} value={m}>{m}</Select.Item>
                     ))}
                   </Select.Content>
                 </Select>
               </Field>
-              <Field label="Text">
-                <Input value={amenity.text} onChange={e => updateAmenity(i, 'text', e.target.value)} placeholder="Private pool villas" />
+              <Field label="Duration — Days" required>
+                <Input type="number" min="1" value={data.duration.days} onChange={e => setDuration('days', e.target.value)} />
               </Field>
-              <Button type="button" variant="danger" size="small" onClick={() => removeAmenity(i)} className="mb-0.5">
-                <XMark />
-              </Button>
+              <Field label="Duration — Nights" required>
+                <Input type="number" min="0" value={data.duration.nights} onChange={e => setDuration('nights', e.target.value)} />
+              </Field>
+              <Field label="Average Rating">
+                <Input type="number" min="0" max="5" step="0.1" value={data.review_start} onChange={e => set('review_start', e.target.value)} />
+              </Field>
+              <Field label="Review Count">
+                <Input type="number" min="0" value={data.review_count} onChange={e => set('review_count', e.target.value)} />
+              </Field>
             </div>
-          ))}
-          <Button type="button" variant="secondary" size="small" onClick={addAmenity}>
-            <Plus /> Add Amenity
-          </Button>
-        </div>
-      </Section>
+          </Section>
 
-      {/* Things To Do */}
-      <Section title="Things To Do">
+          <Section
+            title="Description"
+            description="Write the primary copy for the itinerary. Aim for clarity and conversion."
+          >
+            <Textarea
+              value={data.description}
+              onChange={e => set('description', e.target.value)}
+              placeholder="Write a compelling description of this itinerary..."
+              rows={6}
+            />
+          </Section>
+
+          <Section
+            title="Pricing"
+            description="Enter the pricing breakdown exactly as it should be displayed."
+          >
+            <div className={twoColumnGridClass}>
+              <Field label="Price (e.g. $2,899)" required>
+                <Input value={data.pricing.price} onChange={e => setPricing('price', e.target.value)} placeholder="$2,899" />
+              </Field>
+              <Field label="Original Price">
+                <Input value={data.pricing.original_price} onChange={e => setPricing('original_price', e.target.value)} placeholder="$3,399" />
+              </Field>
+              <Field label="Fees & Taxes">
+                <Input value={data.pricing.fee_and_taxes} onChange={e => setPricing('fee_and_taxes', e.target.value)} placeholder="$322" />
+              </Field>
+              <Field label="Total">
+                <Input value={data.pricing.total} onChange={e => setPricing('total', e.target.value)} placeholder="$3,221" />
+              </Field>
+            </div>
+            <Field label="Price Label (optional)">
+              <Input value={data.pricing.price_label} onChange={e => setPricing('price_label', e.target.value)} placeholder="per person" />
+            </Field>
+          </Section>
+        </div>
+
+        <div className="space-y-6 xl:sticky xl:top-6 self-start">
+          <Section
+            title="Publishing"
+            description="Quick controls for status and classification."
+          >
+            <div className="rounded-lg border border-ui-border-base bg-ui-bg-subtle p-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <Text weight="plus" size="small">Active itinerary</Text>
+                  <Text size="small" className="text-ui-fg-subtle">
+                    Toggle whether this itinerary should appear as available.
+                  </Text>
+                </div>
+                <Switch checked={data.is_active} onCheckedChange={v => set('is_active', v)} />
+              </div>
+            </div>
+
+            <Field label="Categories">
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Select value={newCategory} onValueChange={setNewCategory}>
+                  <Select.Trigger className="w-full">
+                    <Select.Value placeholder="Select a supported category" />
+                  </Select.Trigger>
+                  <Select.Content>
+                    {FRONTEND_SUPPORTED_CATEGORY_OPTIONS.map((category) => (
+                      <Select.Item key={category} value={category}>
+                        {category}
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select>
+                <Button type="button" variant="secondary" size="small" onClick={addCategory} className="sm:self-end">
+                  <Plus /> Add
+                </Button>
+              </div>
+            </Field>
+
+            {data.categories.length ? (
+              <div className="flex flex-wrap gap-2">
+                {data.categories.map((cat, i) => (
+                  <Badge key={i} color="blue" className="flex items-center gap-1">
+                    {cat.category}
+                    <button type="button" onClick={() => removeCategory(i)} className="ml-1">
+                      <XMark className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+            ) : (
+              <EmptyState message="No categories added yet." />
+            )}
+          </Section>
+
+          <Section
+            title="Images"
+            description="The cover preview shows the full image without cropping while staying visually compact."
+          >
+            <Field label="Featured Image URL">
+              <Input value={data.featured_image} onChange={e => set('featured_image', e.target.value)} placeholder="https://..." />
+            </Field>
+
+            {data.featured_image ? (
+              <div className="rounded-xl border border-ui-border-base bg-ui-bg-subtle p-3">
+                <div className="flex min-h-[220px] items-center justify-center overflow-hidden rounded-lg bg-ui-bg-base p-3">
+                  <img
+                    src={data.featured_image}
+                    alt="Featured"
+                    className="max-h-[280px] w-full rounded-md object-contain"
+                  />
+                </div>
+              </div>
+            ) : (
+              <EmptyState message="Add a featured image URL to preview it here." />
+            )}
+
+            <Field label="Gallery Images">
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Input
+                  value={newGalleryUrl}
+                  onChange={e => setNewGalleryUrl(e.target.value)}
+                  placeholder="https://..."
+                  onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addGalleryImg())}
+                />
+                <Button type="button" variant="secondary" size="small" onClick={addGalleryImg} className="sm:self-end">
+                  <Plus /> Add
+                </Button>
+              </div>
+            </Field>
+
+            {data.gallery_imgs.length ? (
+              <div className="space-y-2">
+                {data.gallery_imgs.map((url, i) => (
+                  <div key={i} className="flex items-center gap-3 rounded-lg border border-ui-border-base bg-ui-bg-subtle p-2.5">
+                    <div className="flex h-14 w-20 shrink-0 items-center justify-center overflow-hidden rounded-md bg-ui-bg-base">
+                      <img src={url} alt="" className="h-full w-full object-contain" />
+                    </div>
+                    <Text size="small" className="flex-1 truncate text-ui-fg-subtle">{url}</Text>
+                    <Button type="button" variant="danger" size="small" onClick={() => removeGalleryImg(i)}>
+                      <XMark />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <EmptyState message="No gallery images added yet." />
+            )}
+          </Section>
+        </div>
+      </div>
+
+      <div className="grid gap-6 2xl:grid-cols-2">
+        <Section
+          title="Locations (for map)"
+          description="Add destination pins and a default center point for the map."
+        >
+          <div className="space-y-3">
+            {data.locations.map((loc, i) => (
+              <div key={i} className="grid gap-3 rounded-lg border border-ui-border-base bg-ui-bg-subtle p-3 md:grid-cols-[minmax(0,1.5fr)_1fr_1fr_auto] md:items-end">
+                <Field label="Name">
+                  <Input value={loc.name} onChange={e => updateLocation(i, 'name', e.target.value)} placeholder="Ubud" />
+                </Field>
+                <Field label="Lat">
+                  <Input value={loc.lat} onChange={e => updateLocation(i, 'lat', e.target.value)} placeholder="-8.5069" />
+                </Field>
+                <Field label="Lng">
+                  <Input value={loc.lng} onChange={e => updateLocation(i, 'lng', e.target.value)} placeholder="115.2625" />
+                </Field>
+                <Button type="button" variant="danger" size="small" onClick={() => removeLocation(i)} className="md:mb-0.5">
+                  <XMark />
+                </Button>
+              </div>
+            ))}
+            <Button type="button" variant="secondary" size="small" onClick={addLocation}>
+              <Plus /> Add Location
+            </Button>
+          </div>
+
+          <div className={twoColumnGridClass}>
+            <Field label="Map Center Lat">
+              <Input value={data.map_lat} onChange={e => set('map_lat', e.target.value)} placeholder="-8.4095" />
+            </Field>
+            <Field label="Map Center Lng">
+              <Input value={data.map_lng} onChange={e => set('map_lng', e.target.value)} placeholder="115.1889" />
+            </Field>
+          </div>
+        </Section>
+
+        <Section
+          title="Amenities"
+          description="Short highlights that help users scan the offering quickly."
+        >
+          <div className="space-y-3">
+            {data.amenities.map((amenity, i) => (
+              <div key={i} className="grid gap-3 rounded-lg border border-ui-border-base bg-ui-bg-subtle p-3 md:grid-cols-[220px_minmax(0,1fr)_auto] md:items-end">
+                <Field label="Icon">
+                  <Select value={amenity.icon} onValueChange={v => updateAmenity(i, 'icon', v)}>
+                    <Select.Trigger className="w-full">
+                      <Select.Value />
+                    </Select.Trigger>
+                    <Select.Content>
+                      {FRONTEND_SUPPORTED_ICON_OPTIONS.map(icon => (
+                        <Select.Item key={icon} value={icon}>{icon}</Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select>
+                </Field>
+                <Field label="Text">
+                  <Input value={amenity.text} onChange={e => updateAmenity(i, 'text', e.target.value)} placeholder="Private pool villas" />
+                </Field>
+                <Button type="button" variant="danger" size="small" onClick={() => removeAmenity(i)} className="md:mb-0.5">
+                  <XMark />
+                </Button>
+              </div>
+            ))}
+            <Button type="button" variant="secondary" size="small" onClick={addAmenity}>
+              <Plus /> Add Amenity
+            </Button>
+          </div>
+        </Section>
+
+        <Section
+          title="Includes"
+          description="What the package covers."
+        >
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Input
+              value={newInclude}
+              onChange={e => setNewInclude(e.target.value)}
+              placeholder="6 nights luxury villa stay"
+              onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addInclude())}
+            />
+            <Button type="button" variant="secondary" size="small" onClick={addInclude} className="sm:self-end">
+              <Plus /> Add
+            </Button>
+          </div>
+
+          {data.includes.length ? (
+            <div className="mt-2 space-y-2">
+              {data.includes.map((item, i) => (
+                <div key={i} className="flex items-center gap-2 rounded-lg border border-ui-border-base bg-ui-bg-subtle px-3 py-2">
+                  <Text size="small" className="flex-1">✓ {item}</Text>
+                  <Button type="button" variant="danger" size="small" onClick={() => removeInclude(i)}>
+                    <XMark />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <EmptyState message="No included items added yet." />
+          )}
+        </Section>
+
+        <Section
+          title="Excludes"
+          description="What is intentionally not part of the package."
+        >
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Input
+              value={newExclude}
+              onChange={e => setNewExclude(e.target.value)}
+              placeholder="International flights"
+              onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addExclude())}
+            />
+            <Button type="button" variant="secondary" size="small" onClick={addExclude} className="sm:self-end">
+              <Plus /> Add
+            </Button>
+          </div>
+
+          {data.excludes.length ? (
+            <div className="mt-2 space-y-2">
+              {data.excludes.map((item, i) => (
+                <div key={i} className="flex items-center gap-2 rounded-lg border border-ui-border-base bg-ui-bg-subtle px-3 py-2">
+                  <Text size="small" className="flex-1">✗ {item}</Text>
+                  <Button type="button" variant="danger" size="small" onClick={() => removeExclude(i)}>
+                    <XMark />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <EmptyState message="No excluded items added yet." />
+          )}
+        </Section>
+      </div>
+
+      <Section
+        title="Things To Do"
+        description="Build the itinerary experiences visitors will browse on the detail page."
+      >
         <div className="space-y-4">
           {data.things_to_do.map((item, i) => (
-            <div key={i} className="border border-ui-border-base rounded-md p-4 space-y-3">
-              <div className="flex justify-between items-center">
+            <div key={i} className="space-y-3 rounded-xl border border-ui-border-base bg-ui-bg-subtle p-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <Text weight="plus" size="small">Activity {i + 1}</Text>
                 <Button type="button" variant="danger" size="small" onClick={() => removeThingToDo(i)}>
                   <XMark /> Remove
                 </Button>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className={twoColumnGridClass}>
                 <Field label="Name">
                   <Input value={item.name} onChange={e => updateThingToDo(i, 'name', e.target.value)} placeholder="Ubud Rice Terrace & Spa" />
                 </Field>
@@ -461,68 +613,20 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
         </div>
       </Section>
 
-      {/* Includes */}
-      <Section title="Includes">
-        <div className="flex gap-2">
-          <Input
-            value={newInclude}
-            onChange={e => setNewInclude(e.target.value)}
-            placeholder="6 nights luxury villa stay"
-            onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addInclude())}
-          />
-          <Button type="button" variant="secondary" size="small" onClick={addInclude}>
-            <Plus /> Add
-          </Button>
-        </div>
-        <div className="space-y-2 mt-2">
-          {data.includes.map((item, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <Text size="small" className="flex-1">✓ {item}</Text>
-              <Button type="button" variant="danger" size="small" onClick={() => removeInclude(i)}>
-                <XMark />
-              </Button>
-            </div>
-          ))}
-        </div>
-      </Section>
-
-      {/* Excludes */}
-      <Section title="Excludes">
-        <div className="flex gap-2">
-          <Input
-            value={newExclude}
-            onChange={e => setNewExclude(e.target.value)}
-            placeholder="International flights"
-            onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addExclude())}
-          />
-          <Button type="button" variant="secondary" size="small" onClick={addExclude}>
-            <Plus /> Add
-          </Button>
-        </div>
-        <div className="space-y-2 mt-2">
-          {data.excludes.map((item, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <Text size="small" className="flex-1">✗ {item}</Text>
-              <Button type="button" variant="danger" size="small" onClick={() => removeExclude(i)}>
-                <XMark />
-              </Button>
-            </div>
-          ))}
-        </div>
-      </Section>
-
-      {/* Accommodations */}
-      <Section title="Accommodations">
+      <Section
+        title="Accommodations"
+        description="List the stays associated with the itinerary."
+      >
         <div className="space-y-4">
           {data.accommodations.map((acc, i) => (
-            <div key={i} className="border border-ui-border-base rounded-md p-4 space-y-3">
-              <div className="flex justify-between items-center">
+            <div key={i} className="space-y-3 rounded-xl border border-ui-border-base bg-ui-bg-subtle p-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <Text weight="plus" size="small">Hotel {i + 1}</Text>
                 <Button type="button" variant="danger" size="small" onClick={() => removeAccommodation(i)}>
                   <XMark /> Remove
                 </Button>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className={twoColumnGridClass}>
                 <Field label="Hotel Name">
                   <Input value={acc.name} onChange={e => updateAccommodation(i, 'name', e.target.value)} placeholder="Hanging Gardens of Bali" />
                 </Field>
@@ -544,18 +648,20 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
         </div>
       </Section>
 
-      {/* Reviews */}
-      <Section title="Reviews">
+      <Section
+        title="Reviews"
+        description="Add concise testimonials and metadata for social proof."
+      >
         <div className="space-y-4">
           {data.reviews.map((review, i) => (
-            <div key={i} className="border border-ui-border-base rounded-md p-4 space-y-3">
-              <div className="flex justify-between items-center">
+            <div key={i} className="space-y-3 rounded-xl border border-ui-border-base bg-ui-bg-subtle p-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <Text weight="plus" size="small">Review {i + 1}</Text>
                 <Button type="button" variant="danger" size="small" onClick={() => removeReview(i)}>
                   <XMark /> Remove
                 </Button>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className={twoColumnGridClass}>
                 <Field label="Title">
                   <Input value={review.title} onChange={e => updateReview(i, 'title', e.target.value)} placeholder="Dream honeymoon" />
                 </Field>
@@ -569,7 +675,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
                   <Input value={review.date} onChange={e => updateReview(i, 'date', e.target.value)} placeholder="May 16, 2025" />
                 </Field>
                 <Field label="Content">
-                  <Textarea value={review.content} onChange={e => updateReview(i, 'content', e.target.value)} placeholder="The private pool villa was amazing..." rows={2} />
+                  <Textarea value={review.content} onChange={e => updateReview(i, 'content', e.target.value)} placeholder="The private pool villa was amazing..." rows={3} />
                 </Field>
                 <Field label="Avatar URL">
                   <Input value={review.author_avatar_url} onChange={e => updateReview(i, 'author_avatar_url', e.target.value)} placeholder="https://..." />
@@ -583,8 +689,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
         </div>
       </Section>
 
-      {/* Actions */}
-      <div className="flex gap-3 justify-end pt-4 border-t border-ui-border-base">
+      <div className="flex justify-end gap-3 border-t border-ui-border-base pt-4">
         <Button type="button" variant="secondary" onClick={onCancel}>
           Cancel
         </Button>

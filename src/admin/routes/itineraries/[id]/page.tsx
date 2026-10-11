@@ -76,7 +76,7 @@ export default function EditItineraryPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-6 px-4 space-y-4">
+    <div className="mx-auto w-full max-w-7xl space-y-4 px-4 py-6">
       <div className="flex items-start justify-between">
         <div>
           <Heading level="h1">{formData.title}</Heading>
@@ -89,7 +89,7 @@ export default function EditItineraryPage() {
         </div>
       </div>
 
-      <Container className="p-6">
+      <Container className="p-6 lg:p-8">
         <ItineraryForm
           data={formData}
           onChange={setFormData}
