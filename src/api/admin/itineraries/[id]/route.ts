@@ -33,6 +33,7 @@ export async function PUT(req: MedusaRequest, res: MedusaResponse) {
   if (duration.nights !== undefined) updateData.duration_nights = Number(duration.nights)
   if (body.mobility !== undefined) updateData.mobility = body.mobility
   if (body.featured_image !== undefined) updateData.featured_image = body.featured_image
+  if (body.pdf_link !== undefined) updateData.pdf_link = body.pdf_link
   if (body.gallery_imgs !== undefined) updateData.gallery_imgs = body.gallery_imgs
   if (body.gallery_videos !== undefined) updateData.gallery_videos = body.gallery_videos
   if (body.amenities !== undefined) updateData.amenities = body.amenities

@@ -25,6 +25,7 @@ export function formatItinerary(it: any) {
     },
     mobility: it.mobility,
     featured_image: it.featured_image ?? null,
+    pdf_link: it.pdf_link ?? null,
     gallery_imgs: it.gallery_imgs || [],
     gallery_videos: it.gallery_videos || [],
     amenities: (it.amenities || []).map((amenity: any) => ({

@@ -52,6 +52,7 @@ function buildItineraryData(body: Record<string, unknown>) {
     duration_nights: Number(duration.nights) || 0,
     mobility: (body.mobility as string) || 'Easy',
     featured_image: (body.featured_image as string) || null,
+    pdf_link: (body.pdf_link as string) || null,
     gallery_imgs: (body.gallery_imgs as string[]) || [],
     gallery_videos: (body.gallery_videos as string[]) || [],
     amenities: (body.amenities as any[]) || [],

@@ -17,6 +17,7 @@ export type ItineraryFormData = {
   duration: { days: string; nights: string }
   mobility: string
   featured_image: string
+  pdf_link: string
   gallery_imgs: string[]
   gallery_videos: string[]
   amenities: { icon: string; text: string }[]
@@ -45,6 +46,7 @@ export const DEFAULT_FORM_DATA: ItineraryFormData = {
   duration: { days: '7', nights: '6' },
   mobility: 'Easy',
   featured_image: '',
+  pdf_link: '',
   gallery_imgs: [],
   gallery_videos: [],
   amenities: [],
@@ -385,20 +387,20 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
 
           <Section
             title="Pricing"
-            description="Enter the pricing breakdown exactly as it should be displayed."
+            description="Enter AUD amounts. The storefront treats these as Australian dollars."
           >
             <div className={twoColumnGridClass}>
-              <Field label="Price (e.g. $2,899)" required>
-                <Input value={data.pricing.price} onChange={e => setPricing('price', e.target.value)} placeholder="$2,899" />
+              <Field label="Price (AUD, e.g. 2899)" required>
+                <Input value={data.pricing.price} onChange={e => setPricing('price', e.target.value)} placeholder="2899" />
               </Field>
-              <Field label="Original Price">
-                <Input value={data.pricing.original_price} onChange={e => setPricing('original_price', e.target.value)} placeholder="$3,399" />
+              <Field label="Original Price (AUD)">
+                <Input value={data.pricing.original_price} onChange={e => setPricing('original_price', e.target.value)} placeholder="3399" />
               </Field>
-              <Field label="Fees & Taxes">
-                <Input value={data.pricing.fee_and_taxes} onChange={e => setPricing('fee_and_taxes', e.target.value)} placeholder="$322" />
+              <Field label="Fees & Taxes (AUD)">
+                <Input value={data.pricing.fee_and_taxes} onChange={e => setPricing('fee_and_taxes', e.target.value)} placeholder="322" />
               </Field>
-              <Field label="Total">
-                <Input value={data.pricing.total} onChange={e => setPricing('total', e.target.value)} placeholder="$3,221" />
+              <Field label="Total (AUD)">
+                <Input value={data.pricing.total} onChange={e => setPricing('total', e.target.value)} placeholder="3221" />
               </Field>
             </div>
             <Field label="Price Label (optional)">
@@ -544,6 +546,40 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
               </div>
             ) : (
               <EmptyState message="No gallery videos added yet." />
+            )}
+          </Section>
+
+          <Section
+            title="Itinerary PDF"
+            description="Upload or paste a PDF link. The storefront can use this to offer a downloadable itinerary."
+          >
+            <Field label="PDF Link">
+              <Input
+                value={data.pdf_link}
+                onChange={e => set('pdf_link', e.target.value)}
+                placeholder="https://.../itinerary.pdf"
+              />
+            </Field>
+
+            {data.pdf_link ? (
+              <div className="flex items-center gap-3 rounded-lg border border-ui-border-base bg-ui-bg-subtle p-2.5">
+                <div className="flex h-14 w-20 shrink-0 items-center justify-center rounded-md bg-ui-bg-base">
+                  <Text size="xsmall" className="text-ui-fg-subtle">PDF</Text>
+                </div>
+                <a
+                  href={data.pdf_link}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 truncate text-sm text-ui-fg-interactive hover:underline"
+                >
+                  {data.pdf_link}
+                </a>
+                <Button type="button" variant="danger" size="small" onClick={() => set('pdf_link', '')}>
+                  <XMark />
+                </Button>
+              </div>
+            ) : (
+              <EmptyState message="Add a PDF link to preview it here." />
             )}
           </Section>
         </div>

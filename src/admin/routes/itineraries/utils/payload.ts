@@ -22,6 +22,7 @@ export function buildApiPayload(form: ItineraryFormData) {
     },
     mobility: form.mobility,
     featured_image: form.featured_image.trim() || null,
+    pdf_link: form.pdf_link.trim() || null,
     gallery_imgs: form.gallery_imgs,
     gallery_videos: form.gallery_videos,
     amenities: form.amenities.map((amenity) => ({
@@ -92,6 +93,7 @@ export function buildFormData(it: any): ItineraryFormData {
     },
     mobility: it.mobility || 'Easy',
     featured_image: it.featured_image || '',
+    pdf_link: it.pdf_link || '',
     gallery_imgs: it.gallery_imgs || [],
     gallery_videos: it.gallery_videos || [],
     amenities: (it.amenities || []).map((amenity: any) => ({

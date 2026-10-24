@@ -15,6 +15,7 @@ const Itinerary = model.define('itinerary', {
   duration_nights: model.number(),
   mobility: model.text(),
   featured_image: model.text().nullable(),
+  pdf_link: model.text().nullable(),
   gallery_imgs: model.json(),
   gallery_videos: model.json(),
   amenities: model.json(),
