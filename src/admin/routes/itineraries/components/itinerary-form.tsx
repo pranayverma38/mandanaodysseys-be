@@ -1,6 +1,7 @@
 import { Button, Input, Textarea, Select, Switch, Text, Heading, Badge } from '@medusajs/ui'
 import { Plus, XMark } from '@medusajs/icons'
 import { useState } from 'react'
+import { FRONTEND_SUPPORTED_ACTIVITY_ICON_OPTIONS } from '../utils/frontend-activity-icon-options'
 import { FRONTEND_SUPPORTED_CATEGORY_OPTIONS } from '../utils/frontend-category-options'
 import { FRONTEND_SUPPORTED_ICON_OPTIONS } from '../utils/frontend-icon-options'
 
@@ -937,8 +938,10 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
                               </Select.Trigger>
                               <Select.Content>
                                 <Select.Item value={DEFAULT_SUB_ACTIVITY_ICON_OPTION}>No icon selected</Select.Item>
-                                {FRONTEND_SUPPORTED_ICON_OPTIONS.map((icon) => (
-                                  <Select.Item key={icon} value={icon}>{icon}</Select.Item>
+                                {FRONTEND_SUPPORTED_ACTIVITY_ICON_OPTIONS.map((iconOption) => (
+                                  <Select.Item key={iconOption.value} value={iconOption.value}>
+                                    {iconOption.label}
+                                  </Select.Item>
                                 ))}
                               </Select.Content>
                             </Select>
