@@ -2,7 +2,7 @@ import { Button, Input, Textarea, Select, Switch, Text, Heading, Badge } from '@
 import { Plus, XMark } from '@medusajs/icons'
 import { useState } from 'react'
 import { FRONTEND_SUPPORTED_CATEGORY_OPTIONS } from '../utils/frontend-category-options'
-import { DEFAULT_AMENITY_ICON, FRONTEND_SUPPORTED_ICON_OPTIONS } from '../utils/frontend-icon-options'
+import { FRONTEND_SUPPORTED_ICON_OPTIONS } from '../utils/frontend-icon-options'
 
 export type ItineraryFormData = {
   handle: string
@@ -18,6 +18,7 @@ export type ItineraryFormData = {
   mobility: string
   featured_image: string
   gallery_imgs: string[]
+  gallery_videos: string[]
   amenities: { icon: string; text: string }[]
   pricing: { price: string; original_price: string; fee_and_taxes: string; total: string; price_label: string }
   description: string
@@ -45,6 +46,7 @@ export const DEFAULT_FORM_DATA: ItineraryFormData = {
   mobility: 'Easy',
   featured_image: '',
   gallery_imgs: [],
+  gallery_videos: [],
   amenities: [],
   pricing: { price: '', original_price: '', fee_and_taxes: '', total: '', price_label: '' },
   description: '',
@@ -59,6 +61,18 @@ export const DEFAULT_FORM_DATA: ItineraryFormData = {
 }
 
 const MOBILITY_OPTIONS = ['Easy', 'Light Activity', 'Moderate', 'Active']
+const DEFAULT_AMENITY_ICON_OPTION = '__DEFAULT_TICK__'
+
+function reorderItems<T>(items: T[], fromIndex: number, toIndex: number): T[] {
+  if (fromIndex === toIndex) {
+    return items
+  }
+
+  const nextItems = [...items]
+  const [movedItem] = nextItems.splice(fromIndex, 1)
+  nextItems.splice(toIndex, 0, movedItem)
+  return nextItems
+}
 
 type SectionProps = {
   title: string
@@ -102,6 +116,31 @@ function EmptyState({ message }: { message: string }) {
         {message}
       </Text>
     </div>
+  )
+}
+
+type DragHandleProps = {
+  onDragStart: (event: React.DragEvent<HTMLButtonElement>) => void
+  onDragEnd: () => void
+}
+
+function DragHandle({ onDragStart, onDragEnd }: DragHandleProps) {
+  return (
+    <button
+      type="button"
+      draggable
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+      className="inline-flex h-9 items-center rounded-md border border-ui-border-base bg-ui-bg-base px-2 text-ui-fg-subtle transition hover:bg-ui-bg-subtle cursor-grab active:cursor-grabbing"
+      title="Drag to reorder"
+      aria-label="Drag to reorder"
+    >
+      <span className="flex flex-col gap-1" aria-hidden="true">
+        <span className="block h-0.5 w-4 rounded-full bg-current" />
+        <span className="block h-0.5 w-4 rounded-full bg-current" />
+        <span className="block h-0.5 w-4 rounded-full bg-current" />
+      </span>
+    </button>
   )
 }
 
@@ -151,6 +190,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
     set('categories', data.categories.filter((_, idx) => idx !== i))
 
   const [newGalleryUrl, setNewGalleryUrl] = useState('')
+  const [newGalleryVideoUrl, setNewGalleryVideoUrl] = useState('')
 
   const addGalleryImg = () => {
     if (!newGalleryUrl.trim()) return
@@ -161,14 +201,26 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
   const removeGalleryImg = (i: number) =>
     set('gallery_imgs', data.gallery_imgs.filter((_, idx) => idx !== i))
 
+  const addGalleryVideo = () => {
+    if (!newGalleryVideoUrl.trim()) return
+    set('gallery_videos', [...data.gallery_videos, newGalleryVideoUrl.trim()])
+    setNewGalleryVideoUrl('')
+  }
+
+  const removeGalleryVideo = (i: number) =>
+    set('gallery_videos', data.gallery_videos.filter((_, idx) => idx !== i))
+
   const addAmenity = () =>
-    set('amenities', [...data.amenities, { icon: DEFAULT_AMENITY_ICON, text: '' }])
+    set('amenities', [...data.amenities, { icon: '', text: '' }])
 
   const updateAmenity = (i: number, field: string, value: string) => {
     const items = [...data.amenities]
     items[i] = { ...items[i], [field]: value }
     set('amenities', items)
   }
+
+  const moveAmenity = (fromIndex: number, toIndex: number) =>
+    set('amenities', reorderItems(data.amenities, fromIndex, toIndex))
 
   const removeAmenity = (i: number) =>
     set('amenities', data.amenities.filter((_, idx) => idx !== i))
@@ -196,6 +248,9 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
   const removeInclude = (i: number) =>
     set('includes', data.includes.filter((_, idx) => idx !== i))
 
+  const moveInclude = (fromIndex: number, toIndex: number) =>
+    set('includes', reorderItems(data.includes, fromIndex, toIndex))
+
   const [newExclude, setNewExclude] = useState('')
 
   const addExclude = () => {
@@ -206,6 +261,9 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
 
   const removeExclude = (i: number) =>
     set('excludes', data.excludes.filter((_, idx) => idx !== i))
+
+  const moveExclude = (fromIndex: number, toIndex: number) =>
+    set('excludes', reorderItems(data.excludes, fromIndex, toIndex))
 
   const addAccommodation = () =>
     set('accommodations', [...data.accommodations, { name: '', imageUrl: '', rating: '4.5', location: '' }])
@@ -239,6 +297,28 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
 
   const removeReview = (i: number) =>
     set('reviews', data.reviews.filter((_, idx) => idx !== i))
+
+  const [draggedAmenityIndex, setDraggedAmenityIndex] = useState<number | null>(null)
+  const [draggedIncludeIndex, setDraggedIncludeIndex] = useState<number | null>(null)
+  const [draggedExcludeIndex, setDraggedExcludeIndex] = useState<number | null>(null)
+
+  const handleAmenityDragStart = (index: number, event: React.DragEvent<HTMLButtonElement>) => {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('text/plain', `amenity:${index}`)
+    setDraggedAmenityIndex(index)
+  }
+
+  const handleIncludeDragStart = (index: number, event: React.DragEvent<HTMLButtonElement>) => {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('text/plain', `include:${index}`)
+    setDraggedIncludeIndex(index)
+  }
+
+  const handleExcludeDragStart = (index: number, event: React.DragEvent<HTMLButtonElement>) => {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('text/plain', `exclude:${index}`)
+    setDraggedExcludeIndex(index)
+  }
 
   return (
     <div className="space-y-6">
@@ -433,6 +513,38 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
             ) : (
               <EmptyState message="No gallery images added yet." />
             )}
+
+            <Field label="Gallery Videos">
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Input
+                  value={newGalleryVideoUrl}
+                  onChange={e => setNewGalleryVideoUrl(e.target.value)}
+                  placeholder="https://..."
+                  onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addGalleryVideo())}
+                />
+                <Button type="button" variant="secondary" size="small" onClick={addGalleryVideo} className="sm:self-end">
+                  <Plus /> Add
+                </Button>
+              </div>
+            </Field>
+
+            {data.gallery_videos.length ? (
+              <div className="space-y-2">
+                {data.gallery_videos.map((url, i) => (
+                  <div key={i} className="flex items-center gap-3 rounded-lg border border-ui-border-base bg-ui-bg-subtle p-2.5">
+                    <div className="flex h-14 w-20 shrink-0 items-center justify-center rounded-md bg-ui-bg-base">
+                      <Text size="xsmall" className="text-ui-fg-subtle">Video</Text>
+                    </div>
+                    <Text size="small" className="flex-1 truncate text-ui-fg-subtle">{url}</Text>
+                    <Button type="button" variant="danger" size="small" onClick={() => removeGalleryVideo(i)}>
+                      <XMark />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <EmptyState message="No gallery videos added yet." />
+            )}
           </Section>
         </div>
       </div>
@@ -476,17 +588,49 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
 
         <Section
           title="Amenities"
-          description="Short highlights that help users scan the offering quickly."
+          description="Short highlights that help users scan the offering quickly. Drag items to rearrange them."
         >
           <div className="space-y-3">
             {data.amenities.map((amenity, i) => (
-              <div key={i} className="grid gap-3 rounded-lg border border-ui-border-base bg-ui-bg-subtle p-3 md:grid-cols-[220px_minmax(0,1fr)_auto] md:items-end">
+              <div
+                key={i}
+                onDragOver={(event) => {
+                  event.preventDefault()
+                  event.dataTransfer.dropEffect = 'move'
+                }}
+                onDragEnter={(event) => {
+                  event.preventDefault()
+                  if (draggedAmenityIndex == null || draggedAmenityIndex === i) {
+                    return
+                  }
+
+                  moveAmenity(draggedAmenityIndex, i)
+                  setDraggedAmenityIndex(i)
+                }}
+                onDrop={(event) => {
+                  event.preventDefault()
+                  setDraggedAmenityIndex(null)
+                }}
+                className={`grid gap-3 rounded-lg border border-ui-border-base bg-ui-bg-subtle p-3 transition-all duration-200 ease-out md:grid-cols-[auto_220px_minmax(0,1fr)_auto] md:items-end ${
+                  draggedAmenityIndex === i ? 'scale-[0.99] opacity-70 shadow-elevation-card-hover' : ''
+                }`}
+              >
+                <div className="md:mb-0.5">
+                  <DragHandle
+                    onDragStart={(event) => handleAmenityDragStart(i, event)}
+                    onDragEnd={() => setDraggedAmenityIndex(null)}
+                  />
+                </div>
                 <Field label="Icon">
-                  <Select value={amenity.icon} onValueChange={v => updateAmenity(i, 'icon', v)}>
+                  <Select
+                    value={amenity.icon || DEFAULT_AMENITY_ICON_OPTION}
+                    onValueChange={(value) => updateAmenity(i, 'icon', value === DEFAULT_AMENITY_ICON_OPTION ? '' : value)}
+                  >
                     <Select.Trigger className="w-full">
-                      <Select.Value />
+                      <Select.Value placeholder="Default tick mark" />
                     </Select.Trigger>
                     <Select.Content>
+                      <Select.Item value={DEFAULT_AMENITY_ICON_OPTION}>Default tick mark</Select.Item>
                       {FRONTEND_SUPPORTED_ICON_OPTIONS.map(icon => (
                         <Select.Item key={icon} value={icon}>{icon}</Select.Item>
                       ))}
@@ -509,7 +653,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
 
         <Section
           title="Includes"
-          description="What the package covers."
+          description="What the package covers. Drag items to rearrange them."
         >
           <div className="flex flex-col gap-2 sm:flex-row">
             <Input
@@ -526,7 +670,33 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
           {data.includes.length ? (
             <div className="mt-2 space-y-2">
               {data.includes.map((item, i) => (
-                <div key={i} className="flex items-center gap-2 rounded-lg border border-ui-border-base bg-ui-bg-subtle px-3 py-2">
+                <div
+                  key={`${item}-${i}`}
+                  onDragOver={(event) => {
+                    event.preventDefault()
+                    event.dataTransfer.dropEffect = 'move'
+                  }}
+                  onDragEnter={(event) => {
+                    event.preventDefault()
+                    if (draggedIncludeIndex == null || draggedIncludeIndex === i) {
+                      return
+                    }
+
+                    moveInclude(draggedIncludeIndex, i)
+                    setDraggedIncludeIndex(i)
+                  }}
+                  onDrop={(event) => {
+                    event.preventDefault()
+                    setDraggedIncludeIndex(null)
+                  }}
+                  className={`flex items-center gap-2 rounded-lg border border-ui-border-base bg-ui-bg-subtle px-3 py-2 transition-all duration-200 ease-out ${
+                    draggedIncludeIndex === i ? 'scale-[0.99] opacity-70 shadow-elevation-card-hover' : ''
+                  }`}
+                >
+                  <DragHandle
+                    onDragStart={(event) => handleIncludeDragStart(i, event)}
+                    onDragEnd={() => setDraggedIncludeIndex(null)}
+                  />
                   <Text size="small" className="flex-1">✓ {item}</Text>
                   <Button type="button" variant="danger" size="small" onClick={() => removeInclude(i)}>
                     <XMark />
@@ -541,7 +711,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
 
         <Section
           title="Excludes"
-          description="What is intentionally not part of the package."
+          description="What is intentionally not part of the package. Drag items to rearrange them."
         >
           <div className="flex flex-col gap-2 sm:flex-row">
             <Input
@@ -558,7 +728,33 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
           {data.excludes.length ? (
             <div className="mt-2 space-y-2">
               {data.excludes.map((item, i) => (
-                <div key={i} className="flex items-center gap-2 rounded-lg border border-ui-border-base bg-ui-bg-subtle px-3 py-2">
+                <div
+                  key={`${item}-${i}`}
+                  onDragOver={(event) => {
+                    event.preventDefault()
+                    event.dataTransfer.dropEffect = 'move'
+                  }}
+                  onDragEnter={(event) => {
+                    event.preventDefault()
+                    if (draggedExcludeIndex == null || draggedExcludeIndex === i) {
+                      return
+                    }
+
+                    moveExclude(draggedExcludeIndex, i)
+                    setDraggedExcludeIndex(i)
+                  }}
+                  onDrop={(event) => {
+                    event.preventDefault()
+                    setDraggedExcludeIndex(null)
+                  }}
+                  className={`flex items-center gap-2 rounded-lg border border-ui-border-base bg-ui-bg-subtle px-3 py-2 transition-all duration-200 ease-out ${
+                    draggedExcludeIndex === i ? 'scale-[0.99] opacity-70 shadow-elevation-card-hover' : ''
+                  }`}
+                >
+                  <DragHandle
+                    onDragStart={(event) => handleExcludeDragStart(i, event)}
+                    onDragEnd={() => setDraggedExcludeIndex(null)}
+                  />
                   <Text size="small" className="flex-1">✗ {item}</Text>
                   <Button type="button" variant="danger" size="small" onClick={() => removeExclude(i)}>
                     <XMark />

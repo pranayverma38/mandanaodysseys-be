@@ -53,6 +53,7 @@ function buildItineraryData(body: Record<string, unknown>) {
     mobility: (body.mobility as string) || 'Easy',
     featured_image: (body.featured_image as string) || null,
     gallery_imgs: (body.gallery_imgs as string[]) || [],
+    gallery_videos: (body.gallery_videos as string[]) || [],
     amenities: (body.amenities as any[]) || [],
     pricing: (body.pricing as object) || {},
     description: (body.description as string) || '',

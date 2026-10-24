@@ -28,6 +28,7 @@ const ITINERARIES = [
       'https://images.pexels.com/photos/762687/pexels-photo-762687.jpeg?auto=compress&cs=tinysrgb&w=1600',
       'https://images.pexels.com/photos/3581369/pexels-photo-3581369.jpeg?auto=compress&cs=tinysrgb&w=1600',
     ],
+    gallery_videos: [],
     amenities: [
       { icon: 'SteeringIcon', text: 'Private A/C cab throughout' },
       { icon: 'ChefHatIcon', text: 'Daily breakfast included' },
@@ -80,6 +81,7 @@ const ITINERARIES = [
       'https://images.pexels.com/photos/3601425/pexels-photo-3601425.jpeg?auto=compress&cs=tinysrgb&w=1600',
       'https://images.pexels.com/photos/1032650/pexels-photo-1032650.jpeg?auto=compress&cs=tinysrgb&w=1600',
     ],
+    gallery_videos: [],
     amenities: [
       { icon: 'BedSingle02Icon', text: 'Private pool villas' },
       { icon: 'ChefHatIcon', text: 'Couples spa & dining' },

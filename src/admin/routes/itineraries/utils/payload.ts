@@ -23,7 +23,11 @@ export function buildApiPayload(form: ItineraryFormData) {
     mobility: form.mobility,
     featured_image: form.featured_image.trim() || null,
     gallery_imgs: form.gallery_imgs,
-    amenities: form.amenities,
+    gallery_videos: form.gallery_videos,
+    amenities: form.amenities.map((amenity) => ({
+      icon: amenity.icon.trim() || null,
+      text: amenity.text.trim(),
+    })),
     pricing: {
       price: form.pricing.price,
       originalPrice: form.pricing.original_price,
@@ -89,7 +93,11 @@ export function buildFormData(it: any): ItineraryFormData {
     mobility: it.mobility || 'Easy',
     featured_image: it.featured_image || '',
     gallery_imgs: it.gallery_imgs || [],
-    amenities: it.amenities || [],
+    gallery_videos: it.gallery_videos || [],
+    amenities: (it.amenities || []).map((amenity: any) => ({
+      icon: typeof amenity?.icon === 'string' ? amenity.icon : '',
+      text: amenity?.text || '',
+    })),
     pricing: {
       price: it.pricing?.price || '',
       original_price: it.pricing?.originalPrice || '',

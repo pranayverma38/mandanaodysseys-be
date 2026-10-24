@@ -26,7 +26,11 @@ export function formatItinerary(it: any) {
     mobility: it.mobility,
     featured_image: it.featured_image ?? null,
     gallery_imgs: it.gallery_imgs || [],
-    amenities: it.amenities || [],
+    gallery_videos: it.gallery_videos || [],
+    amenities: (it.amenities || []).map((amenity: any) => ({
+      icon: typeof amenity?.icon === 'string' ? amenity.icon : null,
+      text: amenity?.text || '',
+    })),
     pricing: it.pricing || {},
     description: it.description,
     things_to_do: (it.things_to_do || []).map((t: any) => ({
