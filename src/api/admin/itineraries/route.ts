@@ -2,6 +2,7 @@ import { MedusaRequest, MedusaResponse } from '@medusajs/framework/http'
 import { ITINERARY_MODULE } from '../../../modules/itinerary'
 import ItineraryModuleService from '../../../modules/itinerary/service'
 import { formatItinerary } from '../../shared/format-itinerary'
+import { splitThingsToDoPayload } from '../../shared/things-to-do'
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const itineraryService: ItineraryModuleService = req.scope.resolve(ITINERARY_MODULE)
@@ -38,6 +39,8 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
 
 function buildItineraryData(body: Record<string, unknown>) {
   const duration = (body.duration as any) || {}
+  const { things_to_do, things_to_do_sub_activities } = splitThingsToDoPayload(body.things_to_do)
+
   return {
     handle: body.handle as string,
     title: body.title as string,
@@ -58,7 +61,8 @@ function buildItineraryData(body: Record<string, unknown>) {
     amenities: (body.amenities as any[]) || [],
     pricing: (body.pricing as object) || {},
     description: (body.description as string) || '',
-    things_to_do: (body.things_to_do as any[]) || [],
+    things_to_do,
+    things_to_do_sub_activities,
     includes: (body.includes as string[]) || [],
     excludes: (body.excludes as string[]) || [],
     accommodations: (body.accommodations as any[]) || [],

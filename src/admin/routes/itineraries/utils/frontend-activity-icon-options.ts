@@ -1,0 +1,11 @@
+import { FRONTEND_SUPPORTED_ICON_OPTIONS } from './frontend-icon-options'
+
+/**
+ * Icons for Things To Do sub-activities.
+ * Time-of-day keys come first; amenity icons follow so the storefront can reuse ICONS_MAP.
+ */
+export const FRONTEND_SUPPORTED_ACTIVITY_ICON_OPTIONS = [
+  'Sun03Icon',
+  'Moon02Icon',
+  ...FRONTEND_SUPPORTED_ICON_OPTIONS,
+] as const

@@ -44,6 +44,11 @@ export function buildApiPayload(form: ItineraryFormData) {
       imageUrl: t.imageUrl,
       lat: parseFloat(t.lat) || 0,
       lng: parseFloat(t.lng) || 0,
+      sub_activities: t.sub_activities.map((sub) => ({
+        icon: sub.icon.trim(),
+        subtitle: sub.subtitle.trim(),
+        description: sub.description,
+      })),
     })),
     includes: form.includes,
     excludes: form.excludes,
@@ -115,6 +120,11 @@ export function buildFormData(it: any): ItineraryFormData {
       imageUrl: t.imageUrl || '',
       lat: String(t.lat || ''),
       lng: String(t.lng || ''),
+      sub_activities: (t.sub_activities || []).map((sub: any) => ({
+        icon: typeof sub?.icon === 'string' ? sub.icon : '',
+        subtitle: sub?.subtitle || '',
+        description: sub?.description || '',
+      })),
     })),
     includes: it.includes || [],
     excludes: it.excludes || [],

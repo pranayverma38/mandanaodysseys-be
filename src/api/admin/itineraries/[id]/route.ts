@@ -2,6 +2,7 @@ import { MedusaRequest, MedusaResponse } from '@medusajs/framework/http'
 import { ITINERARY_MODULE } from '../../../../modules/itinerary'
 import ItineraryModuleService from '../../../../modules/itinerary/service'
 import { formatItinerary } from '../../../shared/format-itinerary'
+import { splitThingsToDoPayload, thingsToDoHaveSubActivities } from '../../../shared/things-to-do'
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const itineraryService: ItineraryModuleService = req.scope.resolve(ITINERARY_MODULE)
@@ -39,7 +40,16 @@ export async function PUT(req: MedusaRequest, res: MedusaResponse) {
   if (body.amenities !== undefined) updateData.amenities = body.amenities
   if (body.pricing !== undefined) updateData.pricing = body.pricing
   if (body.description !== undefined) updateData.description = body.description
-  if (body.things_to_do !== undefined) updateData.things_to_do = body.things_to_do
+  if (body.things_to_do !== undefined) {
+    const split = splitThingsToDoPayload(body.things_to_do)
+    updateData.things_to_do = split.things_to_do
+    if (thingsToDoHaveSubActivities(body.things_to_do) || body.things_to_do_sub_activities !== undefined) {
+      updateData.things_to_do_sub_activities =
+        body.things_to_do_sub_activities ?? split.things_to_do_sub_activities
+    }
+  } else if (body.things_to_do_sub_activities !== undefined) {
+    updateData.things_to_do_sub_activities = body.things_to_do_sub_activities
+  }
   if (body.includes !== undefined) updateData.includes = body.includes
   if (body.excludes !== undefined) updateData.excludes = body.excludes
   if (body.accommodations !== undefined) updateData.accommodations = body.accommodations

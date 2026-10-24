@@ -23,7 +23,19 @@ export type ItineraryFormData = {
   amenities: { icon: string; text: string }[]
   pricing: { price: string; original_price: string; fee_and_taxes: string; total: string; price_label: string }
   description: string
-  things_to_do: { name: string; time: string; description: string; imageUrl: string; lat: string; lng: string }[]
+  things_to_do: {
+    name: string
+    time: string
+    description: string
+    imageUrl: string
+    lat: string
+    lng: string
+    sub_activities: {
+      icon: string
+      subtitle: string
+      description: string
+    }[]
+  }[]
   includes: string[]
   excludes: string[]
   accommodations: { name: string; imageUrl: string; rating: string; location: string }[]
@@ -64,6 +76,7 @@ export const DEFAULT_FORM_DATA: ItineraryFormData = {
 
 const MOBILITY_OPTIONS = ['Easy', 'Light Activity', 'Moderate', 'Active']
 const DEFAULT_AMENITY_ICON_OPTION = '__DEFAULT_TICK__'
+const DEFAULT_SUB_ACTIVITY_ICON_OPTION = '__NO_SUB_ACTIVITY_ICON__'
 
 function reorderItems<T>(items: T[], fromIndex: number, toIndex: number): T[] {
   if (fromIndex === toIndex) {
@@ -228,7 +241,7 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
     set('amenities', data.amenities.filter((_, idx) => idx !== i))
 
   const addThingToDo = () =>
-    set('things_to_do', [...data.things_to_do, { name: '', time: '', description: '', imageUrl: '', lat: '', lng: '' }])
+    set('things_to_do', [...data.things_to_do, { name: '', time: '', description: '', imageUrl: '', lat: '', lng: '', sub_activities: [] }])
 
   const updateThingToDo = (i: number, field: string, value: string) => {
     const items = [...data.things_to_do]
@@ -238,6 +251,54 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
 
   const removeThingToDo = (i: number) =>
     set('things_to_do', data.things_to_do.filter((_, idx) => idx !== i))
+
+  const addThingToDoSubActivity = (thingIndex: number) => {
+    const items = [...data.things_to_do]
+    const currentSubActivities = items[thingIndex]?.sub_activities || []
+
+    items[thingIndex] = {
+      ...items[thingIndex],
+      sub_activities: [
+        ...currentSubActivities,
+        { icon: '', subtitle: '', description: '' },
+      ],
+    }
+
+    set('things_to_do', items)
+  }
+
+  const updateThingToDoSubActivity = (
+    thingIndex: number,
+    subActivityIndex: number,
+    field: 'icon' | 'subtitle' | 'description',
+    value: string
+  ) => {
+    const items = [...data.things_to_do]
+    const subActivities = [...(items[thingIndex]?.sub_activities || [])]
+    subActivities[subActivityIndex] = {
+      ...subActivities[subActivityIndex],
+      [field]: value,
+    }
+
+    items[thingIndex] = {
+      ...items[thingIndex],
+      sub_activities: subActivities,
+    }
+
+    set('things_to_do', items)
+  }
+
+  const removeThingToDoSubActivity = (thingIndex: number, subActivityIndex: number) => {
+    const items = [...data.things_to_do]
+    const subActivities = (items[thingIndex]?.sub_activities || []).filter((_, index) => index !== subActivityIndex)
+
+    items[thingIndex] = {
+      ...items[thingIndex],
+      sub_activities: subActivities,
+    }
+
+    set('things_to_do', items)
+  }
 
   const [newInclude, setNewInclude] = useState('')
 
@@ -407,6 +468,40 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
               <Input value={data.pricing.price_label} onChange={e => setPricing('price_label', e.target.value)} placeholder="per person" />
             </Field>
           </Section>
+
+          <Section
+            title="Itinerary PDF"
+            description="Upload or paste a PDF link. The storefront can use this to offer a downloadable itinerary."
+          >
+            <Field label="PDF Link">
+              <Input
+                value={data.pdf_link}
+                onChange={e => set('pdf_link', e.target.value)}
+                placeholder="https://.../itinerary.pdf"
+              />
+            </Field>
+
+            {data.pdf_link ? (
+              <div className="flex items-center gap-3 rounded-lg border border-ui-border-base bg-ui-bg-subtle p-2.5">
+                <div className="flex h-14 w-20 shrink-0 items-center justify-center rounded-md bg-ui-bg-base">
+                  <Text size="xsmall" className="text-ui-fg-subtle">PDF</Text>
+                </div>
+                <a
+                  href={data.pdf_link}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 truncate text-sm text-ui-fg-interactive hover:underline"
+                >
+                  {data.pdf_link}
+                </a>
+                <Button type="button" variant="danger" size="small" onClick={() => set('pdf_link', '')}>
+                  <XMark />
+                </Button>
+              </div>
+            ) : (
+              <EmptyState message="Add a PDF link to preview it here." />
+            )}
+          </Section>
         </div>
 
         <div className="space-y-6 xl:sticky xl:top-6 self-start">
@@ -546,40 +641,6 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
               </div>
             ) : (
               <EmptyState message="No gallery videos added yet." />
-            )}
-          </Section>
-
-          <Section
-            title="Itinerary PDF"
-            description="Upload or paste a PDF link. The storefront can use this to offer a downloadable itinerary."
-          >
-            <Field label="PDF Link">
-              <Input
-                value={data.pdf_link}
-                onChange={e => set('pdf_link', e.target.value)}
-                placeholder="https://.../itinerary.pdf"
-              />
-            </Field>
-
-            {data.pdf_link ? (
-              <div className="flex items-center gap-3 rounded-lg border border-ui-border-base bg-ui-bg-subtle p-2.5">
-                <div className="flex h-14 w-20 shrink-0 items-center justify-center rounded-md bg-ui-bg-base">
-                  <Text size="xsmall" className="text-ui-fg-subtle">PDF</Text>
-                </div>
-                <a
-                  href={data.pdf_link}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex-1 truncate text-sm text-ui-fg-interactive hover:underline"
-                >
-                  {data.pdf_link}
-                </a>
-                <Button type="button" variant="danger" size="small" onClick={() => set('pdf_link', '')}>
-                  <XMark />
-                </Button>
-              </div>
-            ) : (
-              <EmptyState message="Add a PDF link to preview it here." />
             )}
           </Section>
         </div>
@@ -821,14 +882,11 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
                 <Field label="Name">
                   <Input value={item.name} onChange={e => updateThingToDo(i, 'name', e.target.value)} placeholder="Ubud Rice Terrace & Spa" />
                 </Field>
-                <Field label="Time">
+                <Field label="Day">
                   <Input value={item.time} onChange={e => updateThingToDo(i, 'time', e.target.value)} placeholder="Day 1–2 · Flexible" />
                 </Field>
                 <Field label="Image URL">
                   <Input value={item.imageUrl} onChange={e => updateThingToDo(i, 'imageUrl', e.target.value)} placeholder="https://..." />
-                </Field>
-                <Field label="Description">
-                  <Input value={item.description} onChange={e => updateThingToDo(i, 'description', e.target.value)} placeholder="Walk rice terraces..." />
                 </Field>
                 <Field label="Lat">
                   <Input value={item.lat} onChange={e => updateThingToDo(i, 'lat', e.target.value)} placeholder="-8.4312" />
@@ -836,6 +894,78 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
                 <Field label="Lng">
                   <Input value={item.lng} onChange={e => updateThingToDo(i, 'lng', e.target.value)} placeholder="115.2799" />
                 </Field>
+              </div>
+
+              <div className="space-y-3 rounded-lg border border-ui-border-base bg-ui-bg-base p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="space-y-1">
+                    <Text weight="plus" size="small">Sub Activities</Text>
+                    <Text size="small" className="text-ui-fg-subtle">
+                      Add the smaller timeline items shown inside this day card on the storefront.
+                    </Text>
+                  </div>
+                  <Button type="button" variant="secondary" size="small" onClick={() => addThingToDoSubActivity(i)}>
+                    <Plus /> Add
+                  </Button>
+                </div>
+
+                {item.sub_activities.length ? (
+                  <div className="space-y-3">
+                    {item.sub_activities.map((subActivity, subIndex) => (
+                      <div key={subIndex} className="space-y-3 rounded-lg border border-ui-border-base bg-ui-bg-subtle p-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <Text weight="plus" size="small">Sub Activity {subIndex + 1}</Text>
+                          <Button type="button" variant="danger" size="small" onClick={() => removeThingToDoSubActivity(i, subIndex)}>
+                            <XMark />
+                          </Button>
+                        </div>
+
+                        <div className={twoColumnGridClass}>
+                          <Field label="Icon">
+                            <Select
+                              value={subActivity.icon || DEFAULT_SUB_ACTIVITY_ICON_OPTION}
+                              onValueChange={(value) =>
+                                updateThingToDoSubActivity(
+                                  i,
+                                  subIndex,
+                                  'icon',
+                                  value === DEFAULT_SUB_ACTIVITY_ICON_OPTION ? '' : value
+                                )}
+                            >
+                              <Select.Trigger className="w-full">
+                                <Select.Value placeholder="Select an icon" />
+                              </Select.Trigger>
+                              <Select.Content>
+                                <Select.Item value={DEFAULT_SUB_ACTIVITY_ICON_OPTION}>No icon selected</Select.Item>
+                                {FRONTEND_SUPPORTED_ICON_OPTIONS.map((icon) => (
+                                  <Select.Item key={icon} value={icon}>{icon}</Select.Item>
+                                ))}
+                              </Select.Content>
+                            </Select>
+                          </Field>
+                          <Field label="Sub Title">
+                            <Input
+                              value={subActivity.subtitle}
+                              onChange={e => updateThingToDoSubActivity(i, subIndex, 'subtitle', e.target.value)}
+                              placeholder="Morning"
+                            />
+                          </Field>
+                        </div>
+
+                        <Field label="Description">
+                          <Textarea
+                            value={subActivity.description}
+                            onChange={e => updateThingToDoSubActivity(i, subIndex, 'description', e.target.value)}
+                            placeholder="Meet our representative at the airport and transfer to the hotel."
+                            rows={3}
+                          />
+                        </Field>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState message="No sub activities added yet." />
+                )}
               </div>
             </div>
           ))}

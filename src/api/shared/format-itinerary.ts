@@ -1,3 +1,5 @@
+import { resolveSubActivities } from './things-to-do'
+
 /** Shared formatter: normalises DB row → API response shape the frontend expects. */
 export function formatItinerary(it: any) {
   const days = Math.round(Number(it.duration_days))
@@ -34,13 +36,14 @@ export function formatItinerary(it: any) {
     })),
     pricing: it.pricing || {},
     description: it.description,
-    things_to_do: (it.things_to_do || []).map((t: any) => ({
+    things_to_do: (it.things_to_do || []).map((t: any, index: number) => ({
       name: t.name,
       time: t.time,
       description: t.description,
       imageUrl: t.imageUrl,
       lat: Number(t.lat),
       lng: Number(t.lng),
+      sub_activities: resolveSubActivities(it.things_to_do_sub_activities, index, t.sub_activities),
     })),
     includes: it.includes || [],
     excludes: it.excludes || [],

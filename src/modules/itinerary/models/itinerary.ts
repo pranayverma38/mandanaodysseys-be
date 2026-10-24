@@ -22,6 +22,7 @@ const Itinerary = model.define('itinerary', {
   pricing: model.json(),
   description: model.text(),
   things_to_do: model.json(),
+  things_to_do_sub_activities: model.json().nullable(),
   includes: model.json(),
   excludes: model.json(),
   accommodations: model.json(),
