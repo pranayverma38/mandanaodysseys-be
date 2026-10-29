@@ -449,19 +449,19 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
 
           <Section
             title="Pricing"
-            description="Enter AUD amounts. The storefront treats these as Australian dollars."
+            description="Enter USD amounts. The storefront shows USD as-is and converts to AUD when Australian currency is selected."
           >
             <div className={twoColumnGridClass}>
-              <Field label="Price (AUD, e.g. 2899)" required>
+              <Field label="Price (USD, e.g. 2899)" required>
                 <Input value={data.pricing.price} onChange={e => setPricing('price', e.target.value)} placeholder="2899" />
               </Field>
-              <Field label="Original Price (AUD)">
+              <Field label="Original Price (USD)">
                 <Input value={data.pricing.original_price} onChange={e => setPricing('original_price', e.target.value)} placeholder="3399" />
               </Field>
-              <Field label="Fees & Taxes (AUD)">
+              <Field label="Fees & Taxes (USD)">
                 <Input value={data.pricing.fee_and_taxes} onChange={e => setPricing('fee_and_taxes', e.target.value)} placeholder="322" />
               </Field>
-              <Field label="Total (AUD)">
+              <Field label="Total (USD)">
                 <Input value={data.pricing.total} onChange={e => setPricing('total', e.target.value)} placeholder="3221" />
               </Field>
             </div>
