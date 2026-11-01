@@ -1,4 +1,8 @@
 import type { ItineraryFormData } from '../components/itinerary-form'
+import {
+  EXPERIENCE_SUBTITLE_MAX_LENGTH,
+  EXPERIENCE_TITLE_MAX_LENGTH,
+} from '../../../../api/shared/experiences'
 
 /** Convert form data → API request body */
 export function buildApiPayload(form: ItineraryFormData) {
@@ -52,6 +56,13 @@ export function buildApiPayload(form: ItineraryFormData) {
     })),
     includes: form.includes,
     excludes: form.excludes,
+    experiences: form.experiences.map((experience) => ({
+      title: experience.title.trim().slice(0, EXPERIENCE_TITLE_MAX_LENGTH),
+      subtitle: experience.subtitle.trim().slice(0, EXPERIENCE_SUBTITLE_MAX_LENGTH),
+      imageUrl: experience.imageUrl.trim(),
+      description: experience.description.trim(),
+      location: experience.location.trim(),
+    })),
     accommodations: form.accommodations.map(a => ({
       name: a.name,
       imageUrl: a.imageUrl,
@@ -128,6 +139,13 @@ export function buildFormData(it: any): ItineraryFormData {
     })),
     includes: it.includes || [],
     excludes: it.excludes || [],
+    experiences: (it.experiences || []).map((experience: any) => ({
+      title: experience.title || '',
+      subtitle: experience.subtitle || '',
+      imageUrl: experience.imageUrl || '',
+      description: experience.description || '',
+      location: experience.location || '',
+    })),
     accommodations: (it.accommodations || []).map((a: any) => ({
       name: a.name || '',
       imageUrl: a.imageUrl || '',

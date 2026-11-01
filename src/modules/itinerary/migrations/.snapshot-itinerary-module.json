@@ -358,6 +358,22 @@
           "enumItems": [],
           "mappedType": "json"
         },
+        "experiences": {
+          "name": "experiences",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "json"
+        },
         "map_lat": {
           "name": "map_lat",
           "type": "real",

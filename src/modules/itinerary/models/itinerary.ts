@@ -25,6 +25,7 @@ const Itinerary = model.define('itinerary', {
   things_to_do_sub_activities: model.json().nullable(),
   includes: model.json(),
   excludes: model.json(),
+  experiences: model.json(),
   accommodations: model.json(),
   map_lat: model.float().nullable(),
   map_lng: model.float().nullable(),

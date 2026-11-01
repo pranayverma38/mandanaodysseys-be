@@ -1,6 +1,7 @@
 import { MedusaRequest, MedusaResponse } from '@medusajs/framework/http'
 import { ITINERARY_MODULE } from '../../../modules/itinerary'
 import ItineraryModuleService from '../../../modules/itinerary/service'
+import { normalizeExperiences } from '../../shared/experiences'
 import { formatItinerary } from '../../shared/format-itinerary'
 import { splitThingsToDoPayload } from '../../shared/things-to-do'
 
@@ -65,6 +66,7 @@ function buildItineraryData(body: Record<string, unknown>) {
     things_to_do_sub_activities,
     includes: (body.includes as string[]) || [],
     excludes: (body.excludes as string[]) || [],
+    experiences: normalizeExperiences(body.experiences),
     accommodations: (body.accommodations as any[]) || [],
     map_lat: (body.map as any)?.lat != null ? Number((body.map as any).lat) : null,
     map_lng: (body.map as any)?.lng != null ? Number((body.map as any).lng) : null,

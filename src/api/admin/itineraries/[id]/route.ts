@@ -1,6 +1,7 @@
 import { MedusaRequest, MedusaResponse } from '@medusajs/framework/http'
 import { ITINERARY_MODULE } from '../../../../modules/itinerary'
 import ItineraryModuleService from '../../../../modules/itinerary/service'
+import { normalizeExperiences } from '../../../shared/experiences'
 import { formatItinerary } from '../../../shared/format-itinerary'
 import { splitThingsToDoPayload, thingsToDoHaveSubActivities } from '../../../shared/things-to-do'
 
@@ -52,6 +53,7 @@ export async function PUT(req: MedusaRequest, res: MedusaResponse) {
   }
   if (body.includes !== undefined) updateData.includes = body.includes
   if (body.excludes !== undefined) updateData.excludes = body.excludes
+  if (body.experiences !== undefined) updateData.experiences = normalizeExperiences(body.experiences)
   if (body.accommodations !== undefined) updateData.accommodations = body.accommodations
   if ((body.map as any)?.lat !== undefined) updateData.map_lat = Number((body.map as any).lat)
   if ((body.map as any)?.lng !== undefined) updateData.map_lng = Number((body.map as any).lng)

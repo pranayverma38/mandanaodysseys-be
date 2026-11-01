@@ -1,3 +1,4 @@
+import { normalizeExperiences } from './experiences'
 import { resolveSubActivities } from './things-to-do'
 
 /** Shared formatter: normalises DB row → API response shape the frontend expects. */
@@ -47,6 +48,7 @@ export function formatItinerary(it: any) {
     })),
     includes: it.includes || [],
     excludes: it.excludes || [],
+    experiences: normalizeExperiences(it.experiences),
     accommodations: (it.accommodations || []).map((a: any) => ({
       name: a.name,
       imageUrl: a.imageUrl,

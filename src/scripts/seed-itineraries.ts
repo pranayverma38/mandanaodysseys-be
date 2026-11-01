@@ -42,6 +42,7 @@ const ITINERARIES = [
     ],
     includes: ['5 nights hotel accommodation', 'Daily breakfast', 'Private A/C cab', 'Monument entry fees', 'English-speaking guide', 'All taxes'],
     excludes: ['Flights to/from Delhi', 'Lunch and dinner', 'Personal expenses', 'Tips', 'Travel insurance'],
+    experiences: [],
     accommodations: [
       { name: 'The Lalit New Delhi', imageUrl: 'https://images.pexels.com/photos/262047/pexels-photo-262047.jpeg?auto=compress&cs=tinysrgb&w=800', rating: 4.8, location: 'New Delhi' },
       { name: 'ITC Mughal, Agra', imageUrl: 'https://images.pexels.com/photos/1268871/pexels-photo-1268871.jpeg?auto=compress&cs=tinysrgb&w=800', rating: 4.9, location: 'Agra' },
@@ -97,6 +98,7 @@ const ITINERARIES = [
     ],
     includes: ['6 nights luxury villa and resort stays', 'Daily breakfast and 3 romantic dinners', 'Private airport transfers (DPS)', 'Couples spa treatment in Ubud', 'Uluwatu temple & Kecak dance tickets', 'Private candlelit villa dinner', 'All applicable taxes'],
     excludes: ['International flights', 'Travel insurance', 'Personal expenses', 'Optional water sports', 'Alcoholic beverages (except welcome drink)', 'Tips and gratuities'],
+    experiences: [],
     accommodations: [
       { name: 'Hanging Gardens of Bali', imageUrl: 'https://images.pexels.com/photos/2166553/pexels-photo-2166553.jpeg?auto=compress&cs=tinysrgb&w=800', rating: 4.9, location: 'Ubud, Bali' },
       { name: 'Potato Head Beach Club Hotel', imageUrl: 'https://images.pexels.com/photos/1450360/pexels-photo-1450360.jpeg?auto=compress&cs=tinysrgb&w=800', rating: 4.8, location: 'Seminyak, Bali' },

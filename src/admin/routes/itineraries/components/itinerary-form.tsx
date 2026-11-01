@@ -1,6 +1,10 @@
 import { Button, Input, Textarea, Select, Switch, Text, Heading, Badge } from '@medusajs/ui'
 import { Plus, XMark } from '@medusajs/icons'
 import { useState } from 'react'
+import {
+  EXPERIENCE_SUBTITLE_MAX_LENGTH,
+  EXPERIENCE_TITLE_MAX_LENGTH,
+} from '../../../../api/shared/experiences'
 import { FRONTEND_SUPPORTED_ACTIVITY_ICON_OPTIONS } from '../utils/frontend-activity-icon-options'
 import { FRONTEND_SUPPORTED_CATEGORY_OPTIONS } from '../utils/frontend-category-options'
 import { FRONTEND_SUPPORTED_ICON_OPTIONS } from '../utils/frontend-icon-options'
@@ -39,6 +43,13 @@ export type ItineraryFormData = {
   }[]
   includes: string[]
   excludes: string[]
+  experiences: {
+    title: string
+    subtitle: string
+    imageUrl: string
+    description: string
+    location: string
+  }[]
   accommodations: { name: string; imageUrl: string; rating: string; location: string }[]
   map_lat: string
   map_lng: string
@@ -68,6 +79,7 @@ export const DEFAULT_FORM_DATA: ItineraryFormData = {
   things_to_do: [],
   includes: [],
   excludes: [],
+  experiences: [],
   accommodations: [],
   map_lat: '',
   map_lng: '',
@@ -328,6 +340,21 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
 
   const moveExclude = (fromIndex: number, toIndex: number) =>
     set('excludes', reorderItems(data.excludes, fromIndex, toIndex))
+
+  const addExperience = () =>
+    set('experiences', [
+      ...data.experiences,
+      { title: '', subtitle: '', imageUrl: '', description: '', location: '' },
+    ])
+
+  const updateExperience = (i: number, field: string, value: string) => {
+    const items = [...data.experiences]
+    items[i] = { ...items[i], [field]: value }
+    set('experiences', items)
+  }
+
+  const removeExperience = (i: number) =>
+    set('experiences', data.experiences.filter((_, idx) => idx !== i))
 
   const addAccommodation = () =>
     set('accommodations', [...data.accommodations, { name: '', imageUrl: '', rating: '4.5', location: '' }])
@@ -974,6 +1001,70 @@ export default function ItineraryForm({ data, onChange, loading, onSubmit, submi
           ))}
           <Button type="button" variant="secondary" size="small" onClick={addThingToDo}>
             <Plus /> Add Activity
+          </Button>
+        </div>
+      </Section>
+
+      <Section
+        title="Experiences"
+        description="Highlight the signature experiences shown on the itinerary detail page."
+      >
+        <div className="space-y-4">
+          {data.experiences.map((experience, i) => (
+            <div key={i} className="space-y-3 rounded-xl border border-ui-border-base bg-ui-bg-subtle p-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <Text weight="plus" size="small">Experience {i + 1}</Text>
+                <Button type="button" variant="danger" size="small" onClick={() => removeExperience(i)}>
+                  <XMark /> Remove
+                </Button>
+              </div>
+
+              <div className={twoColumnGridClass}>
+                <Field label={`Experience Title (max ${EXPERIENCE_TITLE_MAX_LENGTH} chars)`}>
+                  <Input
+                    value={experience.title}
+                    onChange={e => updateExperience(i, 'title', e.target.value)}
+                    placeholder="Sunrise jeep trail"
+                    maxLength={EXPERIENCE_TITLE_MAX_LENGTH}
+                  />
+                </Field>
+                <Field label={`Subtitle (max ${EXPERIENCE_SUBTITLE_MAX_LENGTH} chars)`}>
+                  <Input
+                    value={experience.subtitle}
+                    onChange={e => updateExperience(i, 'subtitle', e.target.value)}
+                    placeholder="Mount Batur morning adventure"
+                    maxLength={EXPERIENCE_SUBTITLE_MAX_LENGTH}
+                  />
+                </Field>
+                <Field label="Image URL">
+                  <Input
+                    value={experience.imageUrl}
+                    onChange={e => updateExperience(i, 'imageUrl', e.target.value)}
+                    placeholder="https://..."
+                  />
+                </Field>
+                <Field label="Experience Location">
+                  <Input
+                    value={experience.location}
+                    onChange={e => updateExperience(i, 'location', e.target.value)}
+                    placeholder="Kintamani, Bali"
+                  />
+                </Field>
+              </div>
+
+              <Field label="Description">
+                <Textarea
+                  value={experience.description}
+                  onChange={e => updateExperience(i, 'description', e.target.value)}
+                  placeholder="Describe what makes this experience special for the itinerary."
+                  rows={4}
+                />
+              </Field>
+            </div>
+          ))}
+
+          <Button type="button" variant="secondary" size="small" onClick={addExperience}>
+            <Plus /> Add Experience
           </Button>
         </div>
       </Section>
