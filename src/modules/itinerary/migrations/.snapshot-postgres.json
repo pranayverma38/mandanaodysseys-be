@@ -18864,22 +18864,6 @@
           "enumItems": [],
           "mappedType": "json"
         },
-        "experiences": {
-          "name": "experiences",
-          "type": "jsonb",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": "'[]'",
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "json"
-        },
         "map_lat": {
           "name": "map_lat",
           "type": "float8",
@@ -19023,6 +19007,38 @@
           "comment": null,
           "enumItems": [],
           "mappedType": "text"
+        },
+        "things_to_do_sub_activities": {
+          "name": "things_to_do_sub_activities",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "json"
+        },
+        "experiences": {
+          "name": "experiences",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "'[]'",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "json"
         }
       },
       "name": "itinerary",

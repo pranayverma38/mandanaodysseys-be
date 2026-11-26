@@ -39,6 +39,9 @@ module.exports = defineConfig({
       resolve: './src/modules/reel',
     },
     {
+      resolve: './src/modules/floating-reel',
+    },
+    {
       resolve: '@medusajs/medusa/file',
       options: {
         providers: [
